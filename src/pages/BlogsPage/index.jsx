@@ -36,6 +36,7 @@ const Page = () => {
         handleOpenAddBlogModal,
         handleCloseAddBlogModal,
         handleFormInputChange,
+        handleThumbnailUpload,
     } = useLogic();
 
     // use effect
@@ -56,6 +57,7 @@ const Page = () => {
                 formValues={formValues}
                 onInputChange={handleFormInputChange}
                 onSubmit={handleAddNewBlog}
+                onThumbnailUpload={handleThumbnailUpload}
             />
 
             {/* Blogs Table */}

@@ -1,5 +1,5 @@
 // react
-import React from 'react';
+import React, { useState } from 'react';
 
 // mui
 import {
@@ -10,15 +10,35 @@ import {
   TextField,
   Button,
   Stack,
+  Typography,
+  Box,
 } from '@mui/material';
 
 const AddBlogFormModal = ({
   open,
   onClose,
+  onThumbnailUpload,
   formValues,
   onInputChange,
   onSubmit,
 }) => {
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    console.log('Selected file:', file);
+
+    if (!file) return;
+
+    // Show preview
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+
+    // Upload to S3 via parent
+    onThumbnailUpload(file);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add New Blog</DialogTitle>
@@ -59,7 +79,7 @@ const AddBlogFormModal = ({
             rows={6}
           />
 
-          {/* Release Date & Time */}
+          {/* Release Date */}
           <TextField
             label="Release Date"
             name="blog_release_date_and_time"
@@ -70,6 +90,26 @@ const AddBlogFormModal = ({
             required
             InputLabelProps={{ shrink: true }}
           />
+
+          {/* Blog Thumbnail Upload */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Blog Thumbnail
+            </Typography>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ marginBottom: '10px' }}
+            />
+            {previewUrl && (
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{ width: '100%', borderRadius: 8, maxHeight: 200, objectFit: 'cover' }}
+              />
+            )}
+          </Box>
         </Stack>
       </DialogContent>
 

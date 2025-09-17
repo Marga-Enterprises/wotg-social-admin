@@ -1,5 +1,6 @@
 // imports
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 
 /**
@@ -139,3 +140,30 @@ export const capitalizeWords = (str) => {
     return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
   }).join(' ');
 }
+
+
+/**
+ * Uploads a file to a given URL using HTTP PUT.
+ * @param {File|Blob} file - The file or blob to upload
+ * @param {string} url - The presigned URL to upload the file to
+ * @returns {Promise<void>} - Resolves when upload is complete
+ */
+export const uploadFileToSpaces = async (file, presignedUrl) => {
+  const isolatedAxios = axios.create();
+
+  return isolatedAxios.put(presignedUrl, file, {
+    headers: {
+      'Content-Type': file.type,
+      'x-amz-acl': 'public-read',
+    },
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+    transformRequest: [(data, headers) => {
+      // Clean headers to prevent inherited issues
+      Object.keys(headers).forEach(key => delete headers[key]);
+      headers['Content-Type'] = file.type;
+      headers['x-amz-acl'] = 'public-read';
+      return data;
+    }],
+  });
+};
