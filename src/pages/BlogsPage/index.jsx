@@ -14,7 +14,7 @@ import { Box } from '@mui/material';
 import BlogsTable from '@sections/BlogPageSections/BlogsTable';
 
 // components
-import AddBlogFormModal from '@components/blogs/addBlogFormModal';
+import AddBlogFormModal from '@components/blogs/AddBlogFormModal';
 
 // styles
 import styles from './styles';
