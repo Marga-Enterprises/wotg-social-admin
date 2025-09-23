@@ -11,7 +11,7 @@ RUN npm run build
 FROM node:20.11.0
 WORKDIR /app
 RUN npm install -g serve
-COPY --from=builder /app/build ./build
+COPY --from=builder /app/dist ./dist  
 
 EXPOSE 5173
-CMD ["serve", "-s", "build", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "5173"]  
