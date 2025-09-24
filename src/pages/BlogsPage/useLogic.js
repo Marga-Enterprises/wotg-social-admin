@@ -59,7 +59,7 @@ export const useLogic = () => {
                     setBlogs(res.data.blogs || []);
                     setPageDetails({
                         totalRecords: res.data.totalRecords || 0,
-                        pageIndex: res.data.pageIndex || 1,
+                        pageIndex: res.data.currentPage || 1,
                         totalPages: res.data.totalPages || 0,
                     });
                 }
@@ -111,8 +111,6 @@ export const useLogic = () => {
 
         // Upload thumbnail if selected
         if (selectedThumbnail) {
-            console.log('[[[[[Uploading thumbnail:]]]]]', selectedThumbnail);
-
             const file = selectedThumbnail;
             const fileName = `${Date.now()}_${file.name}`;
             const fileType = file.type;
@@ -156,7 +154,7 @@ export const useLogic = () => {
             .then((res) => {
                 if (res.success) {
                     setOpenAddBlogModal(false);
-                    // window.location.reload();
+                    window.location.reload();
                 } else {
                     console.error('Error creating blog:', res.error);
                 }

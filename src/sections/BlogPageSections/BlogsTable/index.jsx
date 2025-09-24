@@ -35,6 +35,8 @@ const BlogsTableSection = ({
   openAddBlogModal,
   onPageChange,
 }) => {
+  console.log('Rendering BlogsTableSection', page, totalPages);
+
   if (loading) return <LoadingScreen />;
 
   return (
@@ -129,7 +131,7 @@ const BlogsTableSection = ({
       <Pagination
         count={totalPages}
         page={page}
-        onChange={(e, value) => onPageChange(value)}
+        onChange={(e, value) => onPageChange(value)} // ✅ syncs state + URL
         color="primary"
         sx={styles.pagination}
       />
