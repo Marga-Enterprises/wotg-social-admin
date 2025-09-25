@@ -1,17 +1,8 @@
 // react
 import React, { useState } from 'react';
 
-// draft-js
-import { Editor, EditorState } from 'draft-js';
-import 'draft-js/dist/Draft.css';
-
-// utils
-import {
-  saveDraftContent,
-  loadDraftContent,
-  toggleInlineStyle,
-  handleDraftKeyCommand,
-} from '@utils/methods';
+// tinymce
+import { Editor } from '@tinymce/tinymce-react';
 
 // mui
 import {
@@ -36,14 +27,6 @@ const AddBlogFormModal = ({
 }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // Draft.js editor state
-  const [introState, setIntroState] = useState(() =>
-    formValues.blog_intro ? loadDraftContent(formValues.blog_intro) : EditorState.createEmpty()
-  );
-  const [bodyState, setBodyState] = useState(() =>
-    formValues.blog_body ? loadDraftContent(formValues.blog_body) : EditorState.createEmpty()
-  );
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -55,7 +38,7 @@ const AddBlogFormModal = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Add New Blog</DialogTitle>
 
       <DialogContent dividers>
@@ -70,116 +53,62 @@ const AddBlogFormModal = ({
             required
           />
 
-          {/* Blog Intro (Draft.js) */}
+          {/* Blog Intro */}
           <Box>
             <Typography variant="subtitle2" gutterBottom>
               Blog Intro
             </Typography>
-            <Box mb={1}>
-              <Button
-                size="small"
-                onClick={() =>
-                  setIntroState(toggleInlineStyle(introState, 'BOLD'))
-                }
-              >
-                Bold
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  setIntroState(toggleInlineStyle(introState, 'ITALIC'))
-                }
-              >
-                Italic
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  setIntroState(toggleInlineStyle(introState, 'UNDERLINE'))
-                }
-              >
-                Underline
-              </Button>
-            </Box>
-            <Box sx={{ border: '1px solid #ccc', minHeight: 100, p: 1, borderRadius: 1 }}>
-              <Editor
-                editorState={introState}
-                onChange={(newState) => {
-                  setIntroState(newState);
-                  onInputChange({
-                    target: {
-                      name: 'blog_intro',
-                      value: saveDraftContent(newState),
-                    },
-                  });
-                }}
-                handleKeyCommand={(command) => {
-                  const newState = handleDraftKeyCommand(introState, command);
-                  if (newState) {
-                    setIntroState(newState);
-                    return 'handled';
-                  }
-                  return 'not-handled';
-                }}
-                placeholder="Write blog intro..."
-              />
-            </Box>
+            <Editor
+              apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j" // ✅ free for self-hosted usage
+              value={formValues.blog_intro || ''}
+              init={{
+                height: 200,
+                menubar: false,
+                plugins: [
+                  'advlist autolink lists link image charmap preview anchor',
+                  'searchreplace visualblocks code fullscreen',
+                  'insertdatetime media table paste code help wordcount',
+                ],
+                toolbar:
+                  'undo redo | formatselect | bold italic underline | \
+                   alignleft aligncenter alignright alignjustify | \
+                   bullist numlist outdent indent | removeformat | help',
+              }}
+              onEditorChange={(content) =>
+                onInputChange({
+                  target: { name: 'blog_intro', value: content },
+                })
+              }
+            />
           </Box>
 
-          {/* Blog Body (Draft.js) */}
+          {/* Blog Body */}
           <Box>
             <Typography variant="subtitle2" gutterBottom>
               Blog Body
             </Typography>
-            <Box mb={1}>
-              <Button
-                size="small"
-                onClick={() =>
-                  setBodyState(toggleInlineStyle(bodyState, 'BOLD'))
-                }
-              >
-                Bold
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  setBodyState(toggleInlineStyle(bodyState, 'ITALIC'))
-                }
-              >
-                Italic
-              </Button>
-              <Button
-                size="small"
-                onClick={() =>
-                  setBodyState(toggleInlineStyle(bodyState, 'UNDERLINE'))
-                }
-              >
-                Underline
-              </Button>
-            </Box>
-            <Box sx={{ border: '1px solid #ccc', minHeight: 200, p: 1, borderRadius: 1 }}>
-              <Editor
-                editorState={bodyState}
-                onChange={(newState) => {
-                  setBodyState(newState);
-                  onInputChange({
-                    target: {
-                      name: 'blog_body',
-                      value: saveDraftContent(newState),
-                    },
-                  });
-                }}
-                handleKeyCommand={(command) => {
-                  const newState = handleDraftKeyCommand(bodyState, command);
-                  if (newState) {
-                    setBodyState(newState);
-                    return 'handled';
-                  }
-                  return 'not-handled';
-                }}
-                placeholder="Write blog body..."
-              />
-            </Box>
+            <Editor
+              apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j"
+              value={formValues.blog_body || ''}
+              init={{
+                height: 300,
+                menubar: true,
+                plugins: [
+                  'advlist autolink lists link image charmap preview anchor',
+                  'searchreplace visualblocks code fullscreen',
+                  'insertdatetime media table paste code help wordcount',
+                ],
+                toolbar:
+                  'undo redo | formatselect | bold italic underline | \
+                   alignleft aligncenter alignright alignjustify | \
+                   bullist numlist outdent indent | removeformat | help',
+              }}
+              onEditorChange={(content) =>
+                onInputChange({
+                  target: { name: 'blog_body', value: content },
+                })
+              }
+            />
           </Box>
 
           {/* Release Date */}

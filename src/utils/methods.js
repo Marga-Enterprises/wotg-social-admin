@@ -1,7 +1,6 @@
 // External deps
 import dayjs from "dayjs";
 import axios from "axios";
-import { convertToRaw, convertFromRaw, EditorState, RichUtils } from "draft-js";
 
 /* ===============================
    STRING HELPERS
@@ -178,48 +177,4 @@ export const uploadFileToSpaces = async (file, presignedUrl) => {
       },
     ],
   });
-};
-
-/* ===============================
-   DRAFT.JS HELPERS
-================================= */
-
-/**
- * Convert Draft.js EditorState → JSON string (for saving in DB)
- * @param {EditorState} editorState
- * @returns {string}
- */
-export const saveDraftContent = (editorState) =>
-  JSON.stringify(convertToRaw(editorState.getCurrentContent()));
-
-/**
- * Load JSON string → Draft.js ContentState
- * @param {string} raw
- * @returns {EditorState}
- */
-export const loadDraftContent = (raw) => {
-  try {
-    return EditorState.createWithContent(convertFromRaw(JSON.parse(raw)));
-  } catch {
-    return EditorState.createEmpty();
-  }
-};
-
-/**
- * Toggle inline style (Bold, Italic, etc.)
- * @param {EditorState} editorState
- * @param {string} style
- * @returns {EditorState}
- */
-export const toggleInlineStyle = (editorState, style) =>
-  RichUtils.toggleInlineStyle(editorState, style);
-
-/**
- * Handle key commands (Cmd+B, Cmd+I, etc.)
- * @param {EditorState} editorState
- * @param {string} command
- * @returns {EditorState|null}
- */
-export const handleDraftKeyCommand = (editorState, command) => {
-  return RichUtils.handleKeyCommand(editorState, command);
 };
