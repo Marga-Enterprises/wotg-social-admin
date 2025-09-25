@@ -1,169 +1,225 @@
-// imports
-import dayjs from 'dayjs';
-import axios from 'axios';
+// External deps
+import dayjs from "dayjs";
+import axios from "axios";
+import { convertToRaw, convertFromRaw, EditorState, RichUtils } from "draft-js";
 
-
-/**
- * convert object to query string
- * @param {*} params
- */
-export const convertQueryString = (params) => {
-  if (!params || typeof params !== 'object') return '';
-
-  return Object.keys(params)
-    .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-    .join('&');
-};
-
+/* ===============================
+   STRING HELPERS
+================================= */
 
 /**
- * capitalize the first letter of a string
+ * Capitalize the first letter of a string
  * @param {string} str
+ * @returns {string}
  */
 export const capitalizeFirstLetter = (str) => {
-  if (typeof str !== 'string' || str.length === 0) return str;
+  if (typeof str !== "string" || str.length === 0) return str;
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
+/**
+ * Capitalize the first letter of each word in a string
+ * @param {string} str
+ * @returns {string}
+ */
+export const capitalizeWords = (str) => {
+  if (typeof str !== "string" || str.length === 0) return str;
+  return str
+    .split(" ")
+    .map((word) =>
+      word.length === 0
+        ? word
+        : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    )
+    .join(" ");
+};
 
 /**
- * convert to date string in format DD/MM/YYYY
- * supports native Date or Excel serial number
+ * Check if a string is a valid email
+ * @param {string} email
+ * @returns {boolean}
+ */
+export const isValidEmail = (email) => {
+  if (typeof email !== "string") return false;
+  const trimmed = email.trim();
+  if (trimmed.length === 0) return false;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(trimmed);
+};
+
+/* ===============================
+   DATE HELPERS
+================================= */
+
+/**
+ * Convert date input into a YYYY-MM-DD string (safe for MySQL DATE)
+ * Supports Date, string, or Excel serial number
  * @param {string|number|Date} input
+ * @returns {string}
  */
 export const convertDate = (input) => {
-  if (!input) return '';
+  if (!input) return "";
 
   let date;
-  if (typeof input === 'number') {
-    // Convert Excel serial to JS Date
+  if (typeof input === "number") {
+    // Excel serial → JS Date
     const utcDays = input - 25569;
     const utcValue = utcDays * 86400 * 1000;
     date = new Date(utcValue);
   } else {
     date = new Date(input);
-    if (isNaN(date)) return '';
+    if (isNaN(date)) return "";
   }
 
-  const day = date.getUTCDate().toString().padStart(2, '0');
-  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, "0");
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
   const year = date.getUTCFullYear();
 
-  return `${year}-${month}-${day}`; // safe for MySQL DATE field
+  return `${year}-${month}-${day}`;
 };
 
-
 /**
- * convert month number to month name
- * 
- * @param {number} monthNumber - 0 for January, 1 for February,
+ * Convert month number to month name
+ * @param {number} monthNumber (0 = January, 11 = December)
+ * @returns {string}
  */
 export const convertMonthToName = (monthNumber) => {
-  if (typeof monthNumber !== 'number' || monthNumber < 0 || monthNumber > 11) {
-    return '';
+  if (
+    typeof monthNumber !== "number" ||
+    monthNumber < 0 ||
+    monthNumber > 11
+  ) {
+    return "";
   }
-
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
   ];
-
   return months[monthNumber];
 };
 
-
 /**
- * check if a string is a valid email
- * 
- * @param {string} email
- * @return {boolean}
- * */
-export const isValidEmail = (email) => {
-  if (typeof email !== 'string') return false;
-  email = email.trim();
-  if (email.length === 0) return false;
-
-  // Basic regex for email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-
-/**
- * Returns a mapping of age bucket keys to values based on the number of days old.
- * 
- * @param {string|Date} date - The reference date to check the age from (e.g., collection.collection_date)
- * @param {number|string} amount - The amount to insert in the matching bucket
- * @param {Array<{ label: string, key: string, min: number, max?: number }>} buckets - Age ranges
- * @returns {Object} - Key-value pairs per bucket (only one bucket has the amount, others are null)
+ * Group a value into age buckets based on how many days old the date is
+ * @param {string|Date} date
+ * @param {number|string} amount
+ * @param {Array<{ label: string, key: string, min: number, max?: number }>} buckets
+ * @returns {Object}
  */
 export const bucketByAge = (date, amount, buckets) => {
-  const daysOld = dayjs().diff(dayjs(date), 'day');
+  const daysOld = dayjs().diff(dayjs(date), "day");
   const parsedAmount = parseFloat(amount).toFixed(2);
 
-  const result = {};
-
-  for (const bucket of buckets) {
-    const isInRange = bucket.max !== undefined
-      ? daysOld >= bucket.min && daysOld <= bucket.max
-      : daysOld >= bucket.min;
-
-    result[bucket.key] = isInRange ? `₱${parsedAmount}` : null;
-  }
-
-  return result;
+  return buckets.reduce((acc, bucket) => {
+    const inRange =
+      bucket.max !== undefined
+        ? daysOld >= bucket.min && daysOld <= bucket.max
+        : daysOld >= bucket.min;
+    acc[bucket.key] = inRange ? `₱${parsedAmount}` : null;
+    return acc;
+  }, {});
 };
 
+/* ===============================
+   NUMBER / CURRENCY HELPERS
+================================= */
 
 /**
- * Converts a number to PESO format with right commas and two decimal places.
- * @param {number} amount - The amount to format
- * @returns {string} - The formatted amount in PESO format
+ * Format number as Philippine Peso with commas and 2 decimals
+ * @param {number} amount
+ * @returns {string}
  */
 export const formatPeso = (amount) => {
-  if (typeof amount !== 'number' || isNaN(amount)) return '₱0.00';
+  if (typeof amount !== "number" || isNaN(amount)) return "₱0.00";
+  return `₱${amount
+    .toFixed(2)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+};
 
-  return `₱${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-}
-
+/* ===============================
+   NETWORK HELPERS
+================================= */
 
 /**
- * Capitalizes the first letter of each word in a string.
- * @param {string} str - The string to capitalize
- * @return {string} - The capitalized string
+ * Convert object params to query string
+ * @param {Object} params
+ * @returns {string}
  */
-export const capitalizeWords = (str) => {
-  if (typeof str !== 'string' || str.length === 0) return str;
-
-  return str.split(' ').map(word => {
-    if (word.length === 0) return word; // handle multiple spaces
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  }).join(' ');
-}
-
+export const convertQueryString = (params) => {
+  if (!params || typeof params !== "object") return "";
+  return Object.keys(params)
+    .map(
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+    )
+    .join("&");
+};
 
 /**
- * Uploads a file to a given URL using HTTP PUT.
- * @param {File|Blob} file - The file or blob to upload
- * @param {string} url - The presigned URL to upload the file to
- * @returns {Promise<void>} - Resolves when upload is complete
+ * Upload a file to DigitalOcean Spaces (or S3) via presigned URL
+ * @param {File|Blob} file
+ * @param {string} presignedUrl
+ * @returns {Promise}
  */
 export const uploadFileToSpaces = async (file, presignedUrl) => {
   const isolatedAxios = axios.create();
-
   return isolatedAxios.put(presignedUrl, file, {
     headers: {
-      'Content-Type': file.type,
-      'x-amz-acl': 'public-read',
+      "Content-Type": file.type,
+      "x-amz-acl": "public-read",
     },
     maxContentLength: Infinity,
     maxBodyLength: Infinity,
-    transformRequest: [(data, headers) => {
-      // Clean headers to prevent inherited issues
-      Object.keys(headers).forEach(key => delete headers[key]);
-      headers['Content-Type'] = file.type;
-      headers['x-amz-acl'] = 'public-read';
-      return data;
-    }],
+    transformRequest: [
+      (data, headers) => {
+        Object.keys(headers).forEach((key) => delete headers[key]);
+        headers["Content-Type"] = file.type;
+        headers["x-amz-acl"] = "public-read";
+        return data;
+      },
+    ],
   });
+};
+
+/* ===============================
+   DRAFT.JS HELPERS
+================================= */
+
+/**
+ * Convert Draft.js EditorState → JSON string (for saving in DB)
+ * @param {EditorState} editorState
+ * @returns {string}
+ */
+export const saveDraftContent = (editorState) =>
+  JSON.stringify(convertToRaw(editorState.getCurrentContent()));
+
+/**
+ * Load JSON string → Draft.js ContentState
+ * @param {string} raw
+ * @returns {EditorState}
+ */
+export const loadDraftContent = (raw) => {
+  try {
+    return EditorState.createWithContent(convertFromRaw(JSON.parse(raw)));
+  } catch {
+    return EditorState.createEmpty();
+  }
+};
+
+/**
+ * Toggle inline style (Bold, Italic, etc.)
+ * @param {EditorState} editorState
+ * @param {string} style
+ * @returns {EditorState}
+ */
+export const toggleInlineStyle = (editorState, style) =>
+  RichUtils.toggleInlineStyle(editorState, style);
+
+/**
+ * Handle key commands (Cmd+B, Cmd+I, etc.)
+ * @param {EditorState} editorState
+ * @param {string} command
+ * @returns {EditorState|null}
+ */
+export const handleDraftKeyCommand = (editorState, command) => {
+  return RichUtils.handleKeyCommand(editorState, command);
 };

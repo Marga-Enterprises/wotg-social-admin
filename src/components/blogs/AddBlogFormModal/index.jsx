@@ -1,6 +1,18 @@
 // react
 import React, { useState } from 'react';
 
+// draft-js
+import { Editor, EditorState } from 'draft-js';
+import 'draft-js/dist/Draft.css';
+
+// utils
+import {
+  saveDraftContent,
+  loadDraftContent,
+  toggleInlineStyle,
+  handleDraftKeyCommand,
+} from '@utils/methods';
+
 // mui
 import {
   Dialog,
@@ -24,18 +36,21 @@ const AddBlogFormModal = ({
 }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // Draft.js editor state
+  const [introState, setIntroState] = useState(() =>
+    formValues.blog_intro ? loadDraftContent(formValues.blog_intro) : EditorState.createEmpty()
+  );
+  const [bodyState, setBodyState] = useState(() =>
+    formValues.blog_body ? loadDraftContent(formValues.blog_body) : EditorState.createEmpty()
+  );
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-
-    console.log('Selected file:', file);
-
     if (!file) return;
 
-    // Show preview
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
-    // Upload to S3 via parent
     onThumbnailUpload(file);
   };
 
@@ -55,29 +70,117 @@ const AddBlogFormModal = ({
             required
           />
 
-          {/* Blog Intro */}
-          <TextField
-            label="Blog Intro"
-            name="blog_intro"
-            value={formValues.blog_intro || ''}
-            onChange={onInputChange}
-            fullWidth
-            required
-            multiline
-            rows={2}
-          />
+          {/* Blog Intro (Draft.js) */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Blog Intro
+            </Typography>
+            <Box mb={1}>
+              <Button
+                size="small"
+                onClick={() =>
+                  setIntroState(toggleInlineStyle(introState, 'BOLD'))
+                }
+              >
+                Bold
+              </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setIntroState(toggleInlineStyle(introState, 'ITALIC'))
+                }
+              >
+                Italic
+              </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setIntroState(toggleInlineStyle(introState, 'UNDERLINE'))
+                }
+              >
+                Underline
+              </Button>
+            </Box>
+            <Box sx={{ border: '1px solid #ccc', minHeight: 100, p: 1, borderRadius: 1 }}>
+              <Editor
+                editorState={introState}
+                onChange={(newState) => {
+                  setIntroState(newState);
+                  onInputChange({
+                    target: {
+                      name: 'blog_intro',
+                      value: saveDraftContent(newState),
+                    },
+                  });
+                }}
+                handleKeyCommand={(command) => {
+                  const newState = handleDraftKeyCommand(introState, command);
+                  if (newState) {
+                    setIntroState(newState);
+                    return 'handled';
+                  }
+                  return 'not-handled';
+                }}
+                placeholder="Write blog intro..."
+              />
+            </Box>
+          </Box>
 
-          {/* Blog Body */}
-          <TextField
-            label="Blog Body"
-            name="blog_body"
-            value={formValues.blog_body || ''}
-            onChange={onInputChange}
-            fullWidth
-            required
-            multiline
-            rows={6}
-          />
+          {/* Blog Body (Draft.js) */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              Blog Body
+            </Typography>
+            <Box mb={1}>
+              <Button
+                size="small"
+                onClick={() =>
+                  setBodyState(toggleInlineStyle(bodyState, 'BOLD'))
+                }
+              >
+                Bold
+              </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setBodyState(toggleInlineStyle(bodyState, 'ITALIC'))
+                }
+              >
+                Italic
+              </Button>
+              <Button
+                size="small"
+                onClick={() =>
+                  setBodyState(toggleInlineStyle(bodyState, 'UNDERLINE'))
+                }
+              >
+                Underline
+              </Button>
+            </Box>
+            <Box sx={{ border: '1px solid #ccc', minHeight: 200, p: 1, borderRadius: 1 }}>
+              <Editor
+                editorState={bodyState}
+                onChange={(newState) => {
+                  setBodyState(newState);
+                  onInputChange({
+                    target: {
+                      name: 'blog_body',
+                      value: saveDraftContent(newState),
+                    },
+                  });
+                }}
+                handleKeyCommand={(command) => {
+                  const newState = handleDraftKeyCommand(bodyState, command);
+                  if (newState) {
+                    setBodyState(newState);
+                    return 'handled';
+                  }
+                  return 'not-handled';
+                }}
+                placeholder="Write blog body..."
+              />
+            </Box>
+          </Box>
 
           {/* Release Date */}
           <TextField
@@ -106,7 +209,12 @@ const AddBlogFormModal = ({
               <img
                 src={previewUrl}
                 alt="Preview"
-                style={{ width: '100%', borderRadius: 8, maxHeight: 200, objectFit: 'cover' }}
+                style={{
+                  width: '100%',
+                  borderRadius: 8,
+                  maxHeight: 200,
+                  objectFit: 'cover',
+                }}
               />
             )}
           </Box>
