@@ -9,6 +9,7 @@ import NonAuthRouter from '@routers/NonAuthRouter';
 import HomePage from '@pages/HomePage';
 import LoginPage from '@pages/LoginPage';
 import BlogsPage from '@pages/BlogsPage';
+import EditBlogPage from '@pages/EditBlogPage';
 
 // layout
 import MainLayout from '@components/layout/MainLayout';
@@ -47,6 +48,17 @@ function AppRoutes() {
         }
       >
         <Route index element={<BlogsPage />} />
+      </Route>
+
+      <Route
+        path="/blogs/edit/:id"
+        element={
+          <AuthRouter>
+            <MainLayout />
+          </AuthRouter>
+        }
+      >
+        <Route index element={<EditBlogPage />} />
       </Route>
     </Routes>
   );
