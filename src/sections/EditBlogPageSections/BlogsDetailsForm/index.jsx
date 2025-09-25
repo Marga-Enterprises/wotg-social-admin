@@ -47,14 +47,13 @@ const BlogsDetailsForm = ({
     onThumbnailUpload(file);
   };
 
-
   return (
     <Box
-      className={styles.formWrapper}
       component="form"
       noValidate
       autoComplete="off"
-      onSubmit={onSubmit} // ✅ added submit handler
+      onSubmit={onSubmit}
+      sx={styles.formWrapper} // ✅ switched to sx
     >
       <Stack spacing={4}>
         {/* Blog Title */}
@@ -65,12 +64,12 @@ const BlogsDetailsForm = ({
           onChange={onInputChange}
           fullWidth
           required
-          className={styles.textField}
+          sx={styles.textField} // ✅ switched to sx
         />
 
         {/* Blog Intro */}
         <Box>
-          <Typography variant="subtitle1" className={styles.label}>
+          <Typography variant="subtitle1" sx={styles.label}>
             Blog Intro
           </Typography>
           <Editor
@@ -87,7 +86,7 @@ const BlogsDetailsForm = ({
 
         {/* Blog Body */}
         <Box>
-          <Typography variant="subtitle1" className={styles.label}>
+          <Typography variant="subtitle1" sx={styles.label}>
             Blog Body
           </Typography>
           <Editor
@@ -112,27 +111,26 @@ const BlogsDetailsForm = ({
           fullWidth
           required
           InputLabelProps={{ shrink: true }}
-          className={styles.textField}
+          sx={styles.textField} // ✅ switched to sx
         />
 
         {/* Blog Thumbnail Upload */}
         <Box>
-          <Typography variant="subtitle1" className={styles.label}>
+          <Typography variant="subtitle1" sx={styles.label}>
             Blog Thumbnail
           </Typography>
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className={styles.fileInput}
+            style={styles.fileInput} // ✅ plain HTML input → use style
           />
 
-          {/* ✅ Always show thumbnail (preview first, then saved one) */}
           {previewUrl && (
             <img
               src={previewUrl}
               alt="Blog Thumbnail"
-              className={styles.thumbnail}
+              style={styles.thumbnail} // ✅ plain img → use style
             />
           )}
         </Box>
@@ -145,7 +143,7 @@ const BlogsDetailsForm = ({
             color="primary"
             size="large"
             disabled={loading}
-            className={styles.submitBtn}
+            sx={styles.submitBtn} // ✅ switched to sx
           >
             {loading ? 'Saving...' : 'Save Blog'}
           </Button>
