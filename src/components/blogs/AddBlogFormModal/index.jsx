@@ -63,7 +63,7 @@ const AddBlogFormModal = ({
               value={formValues.blog_intro || ''}
               init={{
                 height: 200,
-                menubar: false,
+                menubar: true,
                 plugins: [
                   'advlist autolink lists link image charmap preview anchor',
                   'searchreplace visualblocks code fullscreen',

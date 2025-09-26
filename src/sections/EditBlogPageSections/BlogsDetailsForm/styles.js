@@ -20,7 +20,7 @@ const styles = {
   },
   editorIntro: {
     height: 200,
-    menubar: false,
+    menubar: true,
     plugins: [
       'lists link image paste help wordcount',
     ],
