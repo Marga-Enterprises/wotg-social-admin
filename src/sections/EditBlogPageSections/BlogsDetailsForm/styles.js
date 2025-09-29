@@ -19,7 +19,7 @@ const styles = {
     color: '#333',
   },
   editorIntro: {
-    height: 200,
+    height: 600,
     menubar: true,
     plugins: [
       'lists link image paste help wordcount',
@@ -30,7 +30,7 @@ const styles = {
       'body { font-family: Inter, sans-serif; font-size: 15px; line-height: 1.6; }',
   },
   editorBody: {
-    height: 400,
+    height: 600,
     menubar: true,
     plugins: [
       'advlist autolink lists link image charmap print preview anchor',

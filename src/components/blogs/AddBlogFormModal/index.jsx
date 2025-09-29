@@ -62,7 +62,7 @@ const AddBlogFormModal = ({
               apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j" // ✅ free for self-hosted usage
               value={formValues.blog_intro || ''}
               init={{
-                height: 200,
+                height: 600,
                 menubar: true,
                 plugins: [
                   'advlist autolink lists link image charmap preview anchor',
@@ -91,7 +91,7 @@ const AddBlogFormModal = ({
               apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j"
               value={formValues.blog_body || ''}
               init={{
-                height: 300,
+                height: 600,
                 menubar: true,
                 plugins: [
                   'advlist autolink lists link image charmap preview anchor',
@@ -141,7 +141,7 @@ const AddBlogFormModal = ({
                 style={{
                   width: '100%',
                   borderRadius: 8,
-                  maxHeight: 200,
+                  maxHeight: 500,
                   objectFit: 'cover',
                 }}
               />
