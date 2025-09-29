@@ -33,6 +33,7 @@ const BlogsTableSection = ({
   page,
   totalPages,
   openAddBlogModal,
+  onDeleteBlog,
   onPageChange,
 }) => {
   console.log('Rendering BlogsTableSection', page, totalPages);
@@ -107,6 +108,14 @@ const BlogsTableSection = ({
                         to={`/blogs/edit/${blog.id}`}
                       >
                         Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => onDeleteBlog(blog.id)}
+                      >
+                        Delete
                       </Button>
                     </Stack>
                   </TableCell>

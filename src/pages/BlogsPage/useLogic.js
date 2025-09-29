@@ -42,8 +42,6 @@ export const useLogic = () => {
 
     // Function to fetch blogs based on the page index
     const handleFetchBlogs = useCallback((pageIndex, search) => {
-        console.log('Fetching blogs for page:', pageIndex, 'with search:', search);
-
         if (loadingRef.current) return;
         loadingRef.current = true;
         setLoading(true);
@@ -115,9 +113,6 @@ export const useLogic = () => {
             const fileName = `${Date.now()}_${file.name}`;
             const fileType = file.type;
 
-            console.log('Generated fileName for thumbnail:', fileName);
-            console.log('File type:', fileType);
-
             try {
                 const res = await dispatch(marga.media.getPresignedUrlAction({
                     fileName,
@@ -168,6 +163,38 @@ export const useLogic = () => {
             });
     }, [dispatch, formValues, navigate, selectedThumbnail]);
 
+    
+    // Function to delete a blog
+    const handleDeleteBlog = useCallback(
+        (blogId) => {
+            // 🔔 Ask for confirmation before proceeding
+            const confirmed = window.confirm("Are you sure you want to delete this blog?");
+            if (!confirmed) return;
+
+            if (loadingRef.current) return;
+            loadingRef.current = true;
+            setLoading(true);
+
+            dispatch(marga.blog.deleteBlogAction(blogId))
+            .then((res) => {
+                if (res.success) {
+                    handleFetchBlogs(pageDetails.pageIndex);
+                    window.location.reload();
+                } else {
+                    console.error("Error deleting blog:", res.error);
+                }
+            })
+            .catch((err) => {
+                console.error("Error deleting blog:", err);
+            })
+            .finally(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            });
+        },
+        [dispatch, handleFetchBlogs, pageDetails.pageIndex]
+    );
+
 
     // Function to handle thumbnail upload
     const handleThumbnailUpload = useCallback((file) => {
@@ -187,5 +214,6 @@ export const useLogic = () => {
         handleCloseAddBlogModal,
         handleFormInputChange,
         handleThumbnailUpload,
+        handleDeleteBlog,
     }
 };

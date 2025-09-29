@@ -37,6 +37,7 @@ const Page = () => {
         handleCloseAddBlogModal,
         handleFormInputChange,
         handleThumbnailUpload,
+        handleDeleteBlog,
     } = useLogic();
 
     // use effect
@@ -67,6 +68,7 @@ const Page = () => {
                 page={pageDetails.pageIndex}
                 totalPages={pageDetails.totalPages}
                 openAddBlogModal={handleOpenAddBlogModal}
+                onDeleteBlog={handleDeleteBlog}
                 onPageChange={(newPage) => {
                     const params = new URLSearchParams(location.search);
                     params.set('page', newPage);
