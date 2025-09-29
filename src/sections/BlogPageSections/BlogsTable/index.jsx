@@ -80,7 +80,11 @@ const BlogsTableSection = ({
                   </TableCell>
 
                   <TableCell sx={styles.tableBodyCell}>
-                    {new Date(blog.blog_release_date_and_time).toLocaleString()}
+                    {new Date(blog.blog_release_date_and_time).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
                   </TableCell>
 
                   <TableCell sx={styles.tableBodyCell}>
@@ -96,14 +100,6 @@ const BlogsTableSection = ({
 
                   <TableCell sx={styles.tableBodyCell}>
                     <Stack direction="row" spacing={1}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        component={RouterLink}
-                        to={`/blogs/view/${blog.id}`}
-                      >
-                        View
-                      </Button>
                       <Button
                         variant="contained"
                         size="small"
