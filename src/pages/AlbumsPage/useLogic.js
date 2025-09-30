@@ -201,7 +201,6 @@ export const useLogic = () => {
     return {
         albums,
         loading,
-        selectedThumbnail,
         openAddAlbumModal,
         pageDetails,
         formValues,

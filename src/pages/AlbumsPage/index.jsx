@@ -28,7 +28,6 @@ const Page = () => {
     const {
         albums,
         loading,
-        selectedThumbnail,
         openAddAlbumModal,
         pageDetails,
         formValues,
