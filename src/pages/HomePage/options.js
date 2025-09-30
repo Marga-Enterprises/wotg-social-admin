@@ -1,5 +1,6 @@
 import ArticleIcon from '@mui/icons-material/Article';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import AlbumIcon from '@mui/icons-material/Album';
 
 const options = [
   {
@@ -12,7 +13,13 @@ const options = [
     label: 'Music',
     icon: MusicNoteIcon,
     color: '#d32f2f',
-    path: '#music', // placeholder for now
+    path: '/musics',
+  },
+  {
+    label: 'Albums',
+    icon: AlbumIcon,
+    color: '#388e3c',
+    path: '/albums',
   },
 ];
 

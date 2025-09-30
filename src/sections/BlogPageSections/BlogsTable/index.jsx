@@ -36,8 +36,6 @@ const BlogsTableSection = ({
   onDeleteBlog,
   onPageChange,
 }) => {
-  console.log('Rendering BlogsTableSection', page, totalPages);
-
   if (loading) return <LoadingScreen />;
 
   return (

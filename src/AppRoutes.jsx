@@ -10,6 +10,8 @@ import HomePage from '@pages/HomePage';
 import LoginPage from '@pages/LoginPage';
 import BlogsPage from '@pages/BlogsPage';
 import EditBlogPage from '@pages/EditBlogPage';
+import AlbumsPage from '@pages/AlbumsPage';
+import MusicsPage from '@pages/MusicsPage';
 
 // layout
 import MainLayout from '@components/layout/MainLayout';
@@ -59,6 +61,28 @@ function AppRoutes() {
         }
       >
         <Route index element={<EditBlogPage />} />
+      </Route>
+
+      <Route
+        path="/albums"
+        element={
+          <AuthRouter>
+            <MainLayout />
+          </AuthRouter>
+        }
+      >
+        <Route index element={<AlbumsPage />} />
+      </Route>
+
+      <Route
+        path="/musics"
+        element={
+          <AuthRouter>
+            <MainLayout />
+          </AuthRouter>
+        }
+      >
+        <Route index element={<MusicsPage />} />
       </Route>
     </Routes>
   );
