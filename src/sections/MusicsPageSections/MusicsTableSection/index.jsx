@@ -41,6 +41,7 @@ const MusicsTableSection = ({
   page,
   totalPages,
   openAddMusicModal,
+  onOpenEditMusicModal,
   onDeleteMusic,
   onPageChange,
 }) => {
@@ -119,7 +120,7 @@ const MusicsTableSection = ({
                         variant="contained"
                         size="small"
                         component={RouterLink}
-                        to={`/musics/edit/${music.id}`}
+                        onClick={() => onOpenEditMusicModal(music.id)}
                       >
                         Edit
                       </Button>

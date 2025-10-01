@@ -1,5 +1,5 @@
 // react
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, use } from 'react';
 
 // react-redux
 import { useDispatch } from 'react-redux';
@@ -23,6 +23,8 @@ export const useLogic = () => {
     const [loading, setLoading] = useState(false);
     const [selectedAudio, setSelectedAudio] = useState(null);
     const [openAddMusicModal, setOpenAddMusicModal] = useState(false);
+    const [openEditMusicModal, setOpenEditMusicModal] = useState(false);
+    const [musicId, setMusicId] = useState(null);
 
     const [pageDetails, setPageDetails] = useState({
         totalRecords: 0,
@@ -250,11 +252,153 @@ export const useLogic = () => {
             });
     }, [dispatch, pageDetails.pageIndex, handleFetchMusics]);
 
+
+    // Function to get music By ID for editing
+    const handleGetMusicById = useCallback((musicId) => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        dispatch(marga.music.fetchMusicByIdAction(musicId))
+            .then((res) => {
+                if (res.success) {
+                    const music = res.data;
+                    setFormValues({
+                        title: music.title || '',
+                        audio_url: music.audio_url || '',
+                        genre: music.genre || '',
+                        album_id: music.album_id || null,
+                        duration: music.duration || 0,
+                    });
+                } else {
+                    console.error('Failed to fetch music:', res.error);
+                    alert(`Error: ${res.error || 'Failed to fetch music'}`);
+                }
+            })
+            .catch(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            })
+            .finally(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            });
+    }, [dispatch]);
+
+
+    // Function to update music
+    const handleUpdateMusic = useCallback(async (e) => {
+        e.preventDefault();
+
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        let audioUrl = formValues.audio_url;
+        let duration = formValues.duration;
+
+        // Upload audio if a new file is selected
+        if (selectedAudio) {
+            const file = selectedAudio;
+            const fileName = `${Date.now()}_${file.name}`;
+            const fileType = file.type;
+            try {
+                const res = await dispatch(
+                    marga.media.getPresignedUrlForAudiosAction({
+                        fileName,
+                        fileType,
+                    })
+                );
+
+                if (res.error) {
+                    console.error('Failed to get presigned URL:', res.error);
+                    setLoading(false);
+                    loadingRef.current = false;
+                    return;
+                }
+
+                const { data } = res;
+
+                // ✅ Upload file to Spaces
+                await uploadFileToSpaces(file, data.uploadUrl);
+
+                // ✅ Save final URL for DB (your API likely provides it or reconstruct it)
+                audioUrl = data.publicUrl || data.fileUrl || fileName;
+
+                // ✅ Detect duration using Audio element
+                duration = await new Promise((resolve) => {
+                    const audio = document.createElement('audio');
+                    audio.src = URL.createObjectURL(file);
+                    audio.addEventListener('loadedmetadata', () => {
+                    resolve(Math.floor(audio.duration)); // seconds
+                    });
+                });
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                setLoading(false);
+                loadingRef.current = false;
+                return;
+            }
+        }
+
+        const payload = {
+            ...formValues,
+            audio_url: audioUrl,
+            duration, // ✅ add duration to payload
+        };
+
+        // Dispatch the action to update the music
+        dispatch(marga.music.updateMusicAction(musicId, payload))
+            .then((res) => {
+                if (res.success) {
+                    handleCloseEditMusicModal();
+                    navigate('/musics?page=1'); // Redirect to musics list
+                } else {
+                    console.error('Failed to update music:', res.error);
+                    alert(`Error: ${res.error || 'Failed to update music'}`);
+                }
+                
+                setLoading(false);
+                loadingRef.current = false;
+            })
+            .catch(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            })
+            .finally(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            });
+    }, [dispatch, formValues, selectedAudio, musicId]);
+
+    // Function to open edit music modal
+    const handleOpenEditMusicModal = (id) => {
+        setMusicId(id);
+        handleGetMusicById(id);
+        setOpenEditMusicModal(true);
+    };
+
+
+    // Function to close edit music modal
+    const handleCloseEditMusicModal = () => {
+        setOpenEditMusicModal(false);
+        setMusicId(null);
+        setFormValues({
+            title: '',
+            audio_url: '',
+            genre: '',
+            album_id: null,
+            duration: 0,
+        });
+        setSelectedAudio(null);
+    };
+
     return {
         musics,
         albums,
         loading,
         openAddMusicModal,
+        openEditMusicModal,
         pageDetails,
         formValues,
         handleFetchMusics,
@@ -265,5 +409,8 @@ export const useLogic = () => {
         handleAddNewMusic,
         handleFetchAlbums,
         handleDeleteMusic,
+        handleOpenEditMusicModal,
+        handleCloseEditMusicModal,
+        handleUpdateMusic,
     }
 }

@@ -4,7 +4,7 @@ import AlbumIcon from '@mui/icons-material/Album';
 
 const options = [
   { label: 'Blogs', icon: ArticleIcon, path: '/blogs' },
-  { label: 'Music', icon: MusicNoteIcon, path: '/musics' }, // placeholder
+  { label: 'Musics', icon: MusicNoteIcon, path: '/musics' }, // placeholder
   { label: 'Albums', icon: AlbumIcon, path: '/albums' },    // new option
 ];
 

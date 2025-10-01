@@ -10,7 +10,7 @@ const options = [
     path: '/blogs',
   },
   {
-    label: 'Music',
+    label: 'Musics',
     icon: MusicNoteIcon,
     color: '#d32f2f',
     path: '/musics',

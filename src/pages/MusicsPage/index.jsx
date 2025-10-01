@@ -18,6 +18,7 @@ import MusicsTableSection from '@sections/MusicsPageSections/MusicsTableSection'
 
 // components
 import AddMusicFormModal from '@components/musics/AddMusicFormModal';
+import EditMusicFormModal from '@components/musics/EditMusicFormModal';
 
 const Page = () => {
     // hooks
@@ -30,6 +31,7 @@ const Page = () => {
         albums,
         loading,
         openAddMusicModal,
+        openEditMusicModal,
         pageDetails,
         formValues,
         handleFetchMusics,
@@ -40,6 +42,9 @@ const Page = () => {
         handleAddNewMusic,
         handleFetchAlbums,
         handleDeleteMusic,
+        handleOpenEditMusicModal,
+        handleCloseEditMusicModal,
+        handleUpdateMusic,
     } = useLogic();
 
     // use effect
@@ -68,6 +73,17 @@ const Page = () => {
                 onAudioUpload={handleAudioUpload}
             />
 
+            {/* Edit Music Modal */}
+            <EditMusicFormModal
+                open={openEditMusicModal}
+                albums={albums}
+                onClose={handleCloseEditMusicModal}
+                formValues={formValues}
+                onInputChange={handleFormInputChange}
+                onSubmit={handleUpdateMusic}
+                onAudioUpload={handleAudioUpload}
+            />
+
             {/* Musics Table */}
             <MusicsTableSection
                 loading={loading}
@@ -75,6 +91,7 @@ const Page = () => {
                 page={pageDetails.pageIndex}
                 openAddMusicModal={handleOpenAddMusicModal}
                 onDeleteMusic={handleDeleteMusic}
+                onOpenEditMusicModal={handleOpenEditMusicModal}
                 totalPages={pageDetails.totalPages}
                 onPageChange={(newPage) => {
                     const params = new URLSearchParams(location.search);
