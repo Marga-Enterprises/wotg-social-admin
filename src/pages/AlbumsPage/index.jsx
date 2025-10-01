@@ -15,6 +15,7 @@ import styles from './styles';
 
 // components
 import AddAlbumFormModal from '@components/albums/AddAlbumFormModal';
+import EditAlbumFormModal from '@components/albums/EditAlbumFormModal';
 
 // sections
 import AlbumsTableSection from '@sections/AlbumsPageSections/AlbumsTableSection';
@@ -29,6 +30,7 @@ const Page = () => {
         albums,
         loading,
         openAddAlbumModal,
+        openEditAlbumModal,
         pageDetails,
         formValues,
         handleFetchAlbums,
@@ -38,6 +40,9 @@ const Page = () => {
         handleOpenAddAlbumModal,
         handleCloseAddAlbumModal,
         handleDeleteAlbum,
+        handleOpenEditAlbumModal,
+        handleCloseEditAlbumModal,
+        handleUpdateAlbum,
     } = useLogic();
 
     // use effect
@@ -60,6 +65,16 @@ const Page = () => {
                 onThumbnailUpload={handleThumbnailUpload}
             />
 
+            {/* Edit Album Modal */}
+            <EditAlbumFormModal
+                open={openEditAlbumModal}
+                onClose={handleCloseEditAlbumModal}
+                formValues={formValues}
+                onInputChange={handleFormInputChange}
+                onSubmit={handleUpdateAlbum}
+                onThumbnailUpload={handleThumbnailUpload}
+            />
+
             {/* Albums Table */}
             <AlbumsTableSection
                 loading={loading}
@@ -68,6 +83,7 @@ const Page = () => {
                 totalPages={pageDetails.totalPages}
                 openAddAlbumModal={handleOpenAddAlbumModal}
                 onDeleteAlbum={handleDeleteAlbum}
+                onOpenEditAlbumModal={handleOpenEditAlbumModal}
                 onPageChange={(newPage) => {
                     const params = new URLSearchParams(location.search);
                     params.set('page', newPage);

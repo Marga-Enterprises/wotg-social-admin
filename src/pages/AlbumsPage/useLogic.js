@@ -22,6 +22,8 @@ export const useLogic = () => {
     const [loading, setLoading] = useState(false);
     const [selectedThumbnail, setSelectedThumbnail] = useState(null);
     const [openAddAlbumModal, setOpenAddAlbumModal] = useState(false);
+    const [openEditAlbumModal, setOpenEditAlbumModal] = useState(false);
+    const [albumId, setAlbumId] = useState(null);
 
     const [pageDetails, setPageDetails] = useState({
         totalRecords: 0,
@@ -167,6 +169,26 @@ export const useLogic = () => {
     };
 
 
+    // Function to open edit album modal
+    const handleOpenEditAlbumModal = (albumId) => {
+        handleFetchAlbumById(albumId);
+        setAlbumId(albumId);
+        setOpenEditAlbumModal(true);
+    };
+
+
+    // Function to close edit album modal
+    const handleCloseEditAlbumModal = () => {
+        setFormValues({
+            title: '',
+            cover_image: '',
+        });
+        setAlbumId(null);
+        setSelectedThumbnail(null);
+        setOpenEditAlbumModal(false);
+    };
+
+
     // function do delete an album
     const handleDeleteAlbum = useCallback((albumId) => {
         if (!window.confirm("Are you sure you want to delete this album?")) {
@@ -198,10 +220,105 @@ export const useLogic = () => {
             });
     }, [dispatch, pageDetails.pageIndex]);
 
+
+    // function to get album by id 
+    const handleFetchAlbumById = useCallback((albumId) => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        dispatch(marga.album.fetchAlbumByIdAction(albumId))
+            .then((res) => {
+                if (res.success) {
+                    setFormValues({
+                        title: res.data.title || '',
+                        cover_image: res.data.cover_image || '',
+                    });
+                }
+                setLoading(false);
+                loadingRef.current = false;
+            })
+            .catch(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            })
+            .finally(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            });
+    }, [dispatch]);
+
+
+    // Function to update an existing album
+    const handleUpdateAlbum = useCallback(async (e) => {
+        e.preventDefault();
+
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        let coverImageUrl = '';
+
+        // Upload the thumbnail if selected
+        if (selectedThumbnail) {
+            const file = selectedThumbnail;
+            const fileName = `${Date.now()}_${file.name}`;
+            const fileType = file.type;
+
+            try {
+                const res = await dispatch(marga.media.getPresignedUrlAction({
+                    fileName,
+                    fileType,
+                }));
+
+                if (res.error) {
+                    console.error('Failed to get presigned URL:', res.error);
+                    setLoading(false);
+                    loadingRef.current = false;
+                    return;
+                }
+
+                const { data } = res;
+
+                await uploadFileToSpaces(file, data.uploadUrl); // 👈 USE HELPER HERE
+
+                coverImageUrl = fileName;
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                setLoading(false);
+                loadingRef.current = false;
+                return;
+            }
+        };
+
+        const payload = {
+            ...formValues,
+            cover_image: coverImageUrl || formValues.cover_image || '',
+        };
+
+        dispatch(marga.album.updateAlbumAction(albumId, payload))
+            .then((res) => {
+                if (res.success) {
+                    setOpenEditAlbumModal(false);
+                    navigate(`/albums?page=${pageDetails.pageIndex}`);
+                } else {
+                    console.error('Error updating album:', res.error);
+                }
+            })
+            .catch((err) => {
+                console.error('Error updating album:', err);
+            })
+            .finally(() => {
+                setLoading(false);
+                loadingRef.current = false;
+            });
+    }, [dispatch, formValues, selectedThumbnail, navigate, pageDetails.pageIndex]);
+
     return {
         albums,
         loading,
         openAddAlbumModal,
+        openEditAlbumModal,
         pageDetails,
         formValues,
         handleFetchAlbums,
@@ -211,5 +328,8 @@ export const useLogic = () => {
         handleOpenAddAlbumModal,
         handleCloseAddAlbumModal,
         handleDeleteAlbum,
-    }
-}
+        handleOpenEditAlbumModal,
+        handleCloseEditAlbumModal,
+        handleUpdateAlbum,
+    };
+};

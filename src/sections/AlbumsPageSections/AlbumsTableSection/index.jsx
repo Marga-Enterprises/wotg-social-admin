@@ -34,6 +34,7 @@ const AlbumsTableSection = ({
   totalPages,
   openAddAlbumModal,
   onDeleteAlbum,
+  onOpenEditAlbumModal,
   onPageChange,
 }) => {
   if (loading) return <LoadingScreen />;
@@ -85,7 +86,7 @@ const AlbumsTableSection = ({
                                     variant="contained"
                                     size="small"
                                     component={RouterLink}
-                                    to={`/albums/edit/${album.id}`}
+                                    onClick={() => onOpenEditAlbumModal(album.id)}
                                 >
                                     Edit
                                 </Button>
