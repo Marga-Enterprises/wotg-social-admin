@@ -10,6 +10,9 @@ import { useLogic } from './useLogic';
 // sections
 import PostsTableSection from '@sections/PostsPageSections/PostsTableSection';
 
+// components
+import AddPostFormModal from '@components/posts/AddPostFormModal';
+
 // mui
 import { Box } from '@mui/material';
 
@@ -25,7 +28,6 @@ const Page = () => {
     const {
         loading,
         posts,
-        selectedPost,
         addPostModalOpen,
         editPostModalOpen,
         pageDetails,
@@ -33,9 +35,12 @@ const Page = () => {
         handleFetchPosts,
         handleOpenAddPostModal,
         handleCloseAddPostModal,
-        handleDeletePost,
         handleOpenEditPostModal,
         handleCloseEditPostModal,
+        handleDeletePost,
+        handleFormInputChange,
+        handleAddPost,
+        handleMediaUpload,
     } = useLogic();
 
 
@@ -49,6 +54,16 @@ const Page = () => {
 
     return (
         <Box sx={styles.container}>
+            {/* Add Post Modal */}
+            <AddPostFormModal
+                open={addPostModalOpen}
+                onClose={handleCloseAddPostModal}
+                formValues={formValues}
+                onInputChange={handleFormInputChange}
+                onSubmit={handleAddPost}
+                onMediaUpload={handleMediaUpload}
+            />
+
             {/* Posts Table */}
             <PostsTableSection
                 loading={loading}

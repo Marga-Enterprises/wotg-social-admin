@@ -20,11 +20,11 @@ export const useLogic = () => {
     // states
     const [loading, setLoading] = useState(false);
     const [posts, setPosts] = useState([]);
-    const [selectedPost, setSelectedPost] = useState(null);
+    const [selectedMedia, setSelectedMedia] = useState(null);
     const [addPostModalOpen, setAddPostModalOpen] = useState(false);
     const [editPostModalOpen, setEditPostModalOpen] = useState(false);
     const [postId, setPostId] = useState(null);
-    const [mediaUrls, setMediaUrls] = useState([]);
+
 
     const [pageDetails, setPageDetails] = useState({
         totalRecords: 0,
@@ -34,7 +34,8 @@ export const useLogic = () => {
 
     const [formValues, setFormValues] = useState({
         content: '',
-        mediaUrls
+        mediaUrl: '',
+        release_date: '',
     });
 
 
@@ -79,9 +80,8 @@ export const useLogic = () => {
     const handleOpenAddPostModal = () => {
         setFormValues({
             content: '',
-            mediaUrls: []
+            mediaUrls: ''
         });
-        setMediaUrls([]);
         setAddPostModalOpen(true);
     };
 
@@ -92,14 +92,15 @@ export const useLogic = () => {
     };
 
 
+    // handle media upload
+    const handleMediaUpload = (file) => {
+        setSelectedMedia(file);
+    };
+
+
     // function to open edit post modal
-    const handleOpenEditPostModal = (post) => {
-        setSelectedPost(post);
-        setFormValues({
-            content: post.content || '',
-            mediaUrls: post.media ? post.media.map(m => m.url) : []
-        });
-        setMediaUrls(post.media ? post.media.map(m => m.url) : []);
+    const handleOpenEditPostModal = (postId) => {
+        setPostId(postId);
         setEditPostModalOpen(true);
     };
 
@@ -107,7 +108,7 @@ export const useLogic = () => {
     // function to close edit post modal
     const handleCloseEditPostModal = () => {
         setEditPostModalOpen(false);
-        setSelectedPost(null);
+        setPostId(null);
     };
 
 
@@ -141,10 +142,90 @@ export const useLogic = () => {
         });
     }, [dispatch, handleFetchPosts]);
 
+
+    // handle form input change
+    const handleFormInputChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormValues((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+
+    // handle add post with media upload
+    const handleAddPost = useCallback(async (e) => {
+        e.preventDefault();
+
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        let mediaUploadUrl = '';
+
+        if (selectedMedia) {
+            const file = selectedMedia;
+            const fileName = `${Date.now()}_${file.name}`;
+            const fileType = file.type;
+
+            let res;
+
+            try {
+                if (fileType.startsWith('image/')) {
+                    res = await dispatch(marga.media.getPresignedUrlAction({ fileName, fileType }));
+                } else {
+                    res = await dispatch(marga.media.getPresignedUrlForVideosAction({ fileName, fileType }));
+                }
+
+                const { data } = res;
+
+                await uploadFileToSpaces(file, data.uploadUrl);
+
+                mediaUploadUrl = fileName;
+            } catch (error) {
+                console.error('Media upload failed:', error);
+                alert('Media upload failed. Please try again.');
+                setLoading(false);
+                loadingRef.current = false;
+                return;
+            }
+        }
+
+        const postData = {
+            content: formValues.content,
+            mediaUrl: mediaUploadUrl,
+            mediaType: selectedMedia ? (selectedMedia.type.startsWith('image/') ? 'image' : 'video') : null,
+        };
+
+        dispatch(marga.post.createPostAction(postData))
+        .then((res) => {
+            if (res.success) {
+                handleFetchPosts(1);
+                setAddPostModalOpen(false);
+                setFormValues({
+                    content: '',
+                    mediaUrl: ''
+                });
+            } else {
+                alert(res.error || 'Failed to add post. Please try again.');
+            }
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .catch(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .finally(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        });
+    }, [dispatch, formValues, selectedMedia, handleFetchPosts, pageDetails.pageIndex]);
+
     return {
         loading,
         posts,
-        selectedPost,
         addPostModalOpen,
         editPostModalOpen,
         pageDetails,
@@ -155,5 +236,8 @@ export const useLogic = () => {
         handleOpenEditPostModal,
         handleCloseEditPostModal,
         handleDeletePost,
+        handleFormInputChange,
+        handleAddPost,
+        handleMediaUpload,
     };
 };
