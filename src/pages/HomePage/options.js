@@ -1,6 +1,7 @@
 import ArticleIcon from '@mui/icons-material/Article';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 
 const options = [
   {
@@ -20,6 +21,12 @@ const options = [
     icon: AlbumIcon,
     color: '#388e3c',
     path: '/albums',
+  },
+  {
+    label: 'Posts',
+    icon: PostAddIcon,
+    color: '#f57c00',
+    path: '/posts',
   },
 ];
 
