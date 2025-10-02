@@ -126,7 +126,8 @@ export const useLogic = () => {
             .then((res) => {
                 if (res.success) {
                     setOpenAddAlbumModal(false);
-                    navigate(`/albums?page=${pageDetails.pageIndex}`);
+                    window.location.reload();
+                    // navigate(`/albums?page=${pageDetails.pageIndex}`);
                 } else {
                     console.error('Error creating album:', res.error);
                 }
@@ -300,7 +301,8 @@ export const useLogic = () => {
             .then((res) => {
                 if (res.success) {
                     setOpenEditAlbumModal(false);
-                    navigate(`/albums?page=${pageDetails.pageIndex}`);
+                    window.location.reload();
+                    // navigate(`/albums?page=${pageDetails.pageIndex}`);
                 } else {
                     console.error('Error updating album:', res.error);
                 }

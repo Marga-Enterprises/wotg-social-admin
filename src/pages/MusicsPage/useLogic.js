@@ -201,8 +201,7 @@ export const useLogic = () => {
             .then((res) => {
                 if (res.success) {
                     handleCloseAddMusicModal();
-                    navigate('/musics'); // Redirect to musics list
-                    handleFetchMusics(1, ''); // Refresh to first page
+                    window.location.reload();
                 } else {
                     console.error('Failed to add music:', res.error);
                     alert(`Error: ${res.error || 'Failed to add music'}`);
@@ -352,7 +351,8 @@ export const useLogic = () => {
             .then((res) => {
                 if (res.success) {
                     handleCloseEditMusicModal();
-                    navigate('/musics?page=1'); // Redirect to musics list
+                    window.location.reload();
+                    // navigate('/musics?page=1'); // Redirect to musics list
                 } else {
                     console.error('Failed to update music:', res.error);
                     alert(`Error: ${res.error || 'Failed to update music'}`);
