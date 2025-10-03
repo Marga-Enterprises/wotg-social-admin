@@ -12,6 +12,7 @@ import PostsTableSection from '@sections/PostsPageSections/PostsTableSection';
 
 // components
 import AddPostFormModal from '@components/posts/AddPostFormModal';
+import EditPostFormModal from '@components/posts/EditPostFormModal';
 
 // mui
 import { Box } from '@mui/material';
@@ -41,6 +42,7 @@ const Page = () => {
         handleFormInputChange,
         handleAddPost,
         handleMediaUpload,
+        handleEditPost,
     } = useLogic();
 
 
@@ -61,6 +63,16 @@ const Page = () => {
                 formValues={formValues}
                 onInputChange={handleFormInputChange}
                 onSubmit={handleAddPost}
+                onMediaUpload={handleMediaUpload}
+            />
+
+            {/* Edit Post Modal */}
+            <EditPostFormModal
+                open={editPostModalOpen}
+                onClose={handleCloseEditPostModal}
+                formValues={formValues}
+                onInputChange={handleFormInputChange}
+                onSubmit={handleEditPost}
                 onMediaUpload={handleMediaUpload}
             />
 

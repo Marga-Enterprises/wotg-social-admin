@@ -57,6 +57,7 @@ const PostsTableSection = ({
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>Media</TableCell>
               <TableCell sx={styles.tableHeadCell}>Caption</TableCell>
+              <TableCell sx={styles.tableHeadCell}>Release Date</TableCell>
               <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -114,6 +115,19 @@ const PostsTableSection = ({
                       <Typography variant="body2">
                         {post.content ? post.content.substring(0, 300) : 'No content'}
                         {post.content && post.content.length > 300 ? '...' : ''}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Release Date */}
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Typography variant="body2" color="text.secondary">
+                        {post.release_date
+                          ? new Date(post.release_date).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })
+                          : '—'}
                       </Typography>
                     </TableCell>
 

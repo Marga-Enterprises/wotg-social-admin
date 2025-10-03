@@ -102,6 +102,7 @@ export const useLogic = () => {
     const handleOpenEditPostModal = (postId) => {
         setPostId(postId);
         setEditPostModalOpen(true);
+        handleGetPostDetails(postId);
     };
 
 
@@ -194,6 +195,7 @@ export const useLogic = () => {
 
         const postData = {
             content: formValues.content,
+            release_date: formValues.release_date,
             mediaUrl: mediaUploadUrl,
             mediaType: selectedMedia ? (selectedMedia.type.startsWith('image/') ? 'image' : 'video') : null,
         };
@@ -202,6 +204,7 @@ export const useLogic = () => {
         .then((res) => {
             if (res.success) {
                 handleFetchPosts(1);
+                window.location.reload();
                 setAddPostModalOpen(false);
                 setFormValues({
                     content: '',
@@ -223,6 +226,113 @@ export const useLogic = () => {
         });
     }, [dispatch, formValues, selectedMedia, handleFetchPosts, pageDetails.pageIndex]);
 
+
+    // handle get post details for editing
+    const handleGetPostDetails = useCallback((postId) => {
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        dispatch(marga.post.fetchPostByIdAction(postId))
+        .then((res) => {
+            if (res.success) {
+                const post = res.data;
+                setFormValues({
+                    content: post.content || '',
+                    release_date: post.release_date ? post.release_date.split('T')[0] : '',
+                    mediaUrl: post.media[0].url || '',
+                });
+            }
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .catch(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .finally(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        });
+    }, [dispatch]);
+
+
+    // handle edit post with media upload
+    const handleEditPost = useCallback(async (e) => {
+        e.preventDefault();
+
+        if (!postId) {
+            alert('No post selected for editing.');
+            return;
+        }
+
+        if (loadingRef.current) return;
+        loadingRef.current = true;
+        setLoading(true);
+
+        let mediaUploadUrl = formValues.mediaUrl;
+
+        if (selectedMedia) {
+            const file = selectedMedia;
+            const fileName = `${Date.now()}_${file.name}`;
+            const fileType = file.type;
+
+            let res;
+
+            try {
+                if (fileType.startsWith('image/')) {
+                    res = await dispatch(marga.media.getPresignedUrlAction({ fileName, fileType }));
+                } else {
+                    res = await dispatch(marga.media.getPresignedUrlForVideosAction({ fileName, fileType }));
+                }
+
+                const { data } = res;
+
+                await uploadFileToSpaces(file, data.uploadUrl);
+
+                mediaUploadUrl = fileName;
+            } catch (error) {
+                console.error('Media upload failed:', error);
+                alert('Media upload failed. Please try again.');
+                setLoading(false);
+                loadingRef.current = false;
+                return;
+            }
+        }
+
+        const postData = {
+            content: formValues.content,
+            release_date: formValues.release_date,
+            mediaUrl: mediaUploadUrl,
+            mediaType: selectedMedia ? (selectedMedia.type.startsWith('image/') ? 'image' : 'video') : (formValues.mediaUrl ? 'image' : null),
+        };
+
+        dispatch(marga.post.updatePostAction(postId, postData))
+        .then((res) => {
+            if (res.success) {
+                handleFetchPosts(pageDetails.pageIndex);
+                window.location.reload();
+                setEditPostModalOpen(false);
+                setPostId(null);
+                setFormValues({
+                    content: '',
+                    mediaUrl: ''
+                });
+            }
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .catch(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        })
+        .finally(() => {
+            setLoading(false);
+            loadingRef.current = false;
+        });
+    }, [dispatch, formValues, selectedMedia, postId, handleFetchPosts, pageDetails.pageIndex]);
+
+
     return {
         loading,
         posts,
@@ -239,5 +349,6 @@ export const useLogic = () => {
         handleFormInputChange,
         handleAddPost,
         handleMediaUpload,
+        handleEditPost,
     };
 };
