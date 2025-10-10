@@ -3,8 +3,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    minHeight: '100%',
-    background: 'linear-gradient(135deg, #fff5f5, #ffeaea)',
     px: 3,
     py: 8,
   },

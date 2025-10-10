@@ -1,20 +1,31 @@
-/* ✅ Keep this if you're using Inter font */
+/* Inter font */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
-/* ✅ Minimal reset */
+/* Use one gradient token everywhere */
+:root {
+  --bg-grad: linear-gradient(135deg, #fff5f5 0%, #ffeaea 100%);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100svh;
   font-family: 'Inter', sans-serif;
-  background-color: #f5f5f5; /* optional */
+  background: var(--bg-grad) fixed;      /* ✅ light fade red */
+  background-size: cover;
+  background-repeat: no-repeat;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s ease;
 }
 
-/* ✅ Optional dark mode helper */
+/* Keep the SAME light gradient even in dark mode */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: #121212;
-    color: #e0e0e0;
+    background: var(--bg-grad) !important;  /* ✅ no more dark override */
+    color: #1a1a1a;                          /* readable on light bg */
   }
 }
