@@ -21,6 +21,9 @@ export const useLogic = () => {
     const [blogData, setBlogData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [selectedThumbnail, setSelectedThumbnail] = useState(null);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [message, setMessage] = useState('');
+    const [severity, setSeverity] = useState('success');
     const [formValues, setFormValues] = useState({
         blog_title: '',
         blog_body: '',
@@ -113,13 +116,18 @@ export const useLogic = () => {
         dispatch(marga.blog.updateBlogAction(blogData.id, updatedBlogData))
             .then((res) => {
                 if (res.success) {
-                    // Navigate back to blogs list or show success message
-                    // navigate('/blogs');
+                    setOpenSnackbar(true);
+                    setMessage('Blog updated successfully!');
+                    setSeverity('success');
                 }
                 setLoading(false);
                 loadingRef.current = false;
             })
             .catch(() => {
+                setOpenSnackbar(true);
+                setMessage(res.msg);
+                setSeverity('error');
+
                 setLoading(false);
                 loadingRef.current = false;
             })
@@ -131,10 +139,13 @@ export const useLogic = () => {
 
 
     return {
-        blogData,
         loading,
         formValues,
         selectedThumbnail,
+        openSnackbar,
+        message,
+        severity,
+        setOpenSnackbar,
         handleInputChange,
         handleThumbnailUpload,
         handleFetchBlogById,

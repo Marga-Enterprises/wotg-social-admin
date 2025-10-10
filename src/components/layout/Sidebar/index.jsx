@@ -7,6 +7,8 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Box,
+  Typography,
 } from '@mui/material';
 
 // options
@@ -43,31 +45,54 @@ const Sidebar = ({ open, onClose }) => {
         sx: styles.drawerPaper,
       }}
     >
-      <List>
+      {/* 🔴 Sidebar Header */}
+      <Box sx={styles.headerBox}>
+        <Typography sx={styles.logoText}>WOTG Admin</Typography>
+      </Box>
+
+      <Divider sx={styles.headerDivider} />
+
+      {/* 🔸 Menu Options */}
+      <List sx={styles.menuList}>
         {options.map((option, index) => {
           const Icon = option.icon;
           return (
             <ListItem key={index} disablePadding>
-              <ListItemButton component={Link} to={option.path} onClick={onClose}>
-                <ListItemIcon>
+              <ListItemButton
+                component={Link}
+                to={option.path}
+                onClick={onClose}
+                sx={styles.listButton}
+              >
+                <ListItemIcon sx={styles.listIcon}>
                   <Icon />
                 </ListItemIcon>
-                <ListItemText primary={option.label} />
+                <ListItemText
+                  primary={option.label}
+                  primaryTypographyProps={{ sx: styles.listText }}
+                />
               </ListItemButton>
             </ListItem>
           );
         })}
+      </List>
 
-        <Divider sx={styles.divider} />
+      <Divider sx={styles.sectionDivider} />
 
-        {/* Logout Item */}
+      {/* 🚪 Logout Section */}
+      <Box sx={styles.logoutBox}>
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
-            <ListItemIcon><LogoutIcon /></ListItemIcon>
-            <ListItemText primary="Logout" />
+          <ListItemButton onClick={handleLogout} sx={styles.logoutButton}>
+            <ListItemIcon sx={styles.logoutIconBox}>
+              <LogoutIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="Logout"
+              primaryTypographyProps={{ sx: styles.logoutText }}
+            />
           </ListItemButton>
         </ListItem>
-      </List>
+      </Box>
     </Drawer>
   );
 };

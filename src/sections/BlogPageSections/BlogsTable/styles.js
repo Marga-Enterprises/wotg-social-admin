@@ -1,90 +1,148 @@
 const styles = {
+  // 🔶 Root Wrapper
   root: {
-    p: { xs: 2, sm: 3 },
+    p: { xs: 2, sm: 3, md: 4 },
+    backgroundColor: '#fafafa',
+    borderRadius: '16px',
+    boxShadow: '0 6px 20px rgba(0,0,0,0.05)',
+    maxWidth: 1300,
+    mx: 'auto',
+    transition: 'all 0.3s ease',
   },
 
+  // 🔶 Header Section
   header: {
     direction: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    mb: 2,
+    mb: 3,
   },
-
   addButton: {
-    fontWeight: 'bold',
+    fontWeight: 700,
     textTransform: 'none',
-    borderRadius: 2,
-    px: 2,
-    py: 1,
-    fontSize: {
-      xs: '12px',
-      sm: '13px',
-      md: '14px',
+    borderRadius: '10px',
+    px: 2.5,
+    py: 1.2,
+    fontSize: { xs: '12px', sm: '13px', md: '14px' },
+    background: 'linear-gradient(135deg, #d32f2f, #ef5350)',
+    color: '#fff',
+    boxShadow: '0 4px 12px rgba(211,47,47,0.3)',
+    '&:hover': {
+      background: 'linear-gradient(135deg, #b71c1c, #e53935)',
+      boxShadow: '0 6px 18px rgba(211,47,47,0.4)',
+      transform: 'translateY(-1px)',
     },
   },
 
+  // 🔶 Table Container
   tableContainer: {
-    borderRadius: 2,
+    borderRadius: '12px',
     overflow: 'hidden',
-    boxShadow: 2,
-    width: '100%',
-    overflowX: 'auto',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
     border: '1px solid #e0e0e0',
-    '@media (max-width: 600px)': {
-      boxShadow: 'none',
+    backgroundColor: '#fff',
+    transition: 'box-shadow 0.3s ease',
+    '&:hover': {
+      boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
     },
   },
 
+  // 🔶 Table Header
   tableHeadCell: {
-    fontWeight: 'bold',
-    backgroundColor: '#f4f6f8',
-    border: '1px solid #e0e0e0',
-    fontSize: {
-      xs: '11px',
-      sm: '12px',
-      md: '13px',
-    },
+    fontWeight: 700,
+    backgroundColor: '#f9fafb',
+    color: '#333',
+    borderBottom: '2px solid #e0e0e0',
+    borderRight: '1px solid #eee',
+    fontSize: { xs: '12px', sm: '13px', md: '14px' },
+    textTransform: 'uppercase',
+    letterSpacing: '0.4px',
     whiteSpace: 'nowrap',
+    py: 1.5,
   },
 
+  // 🔶 Table Body
   tableBodyCell: {
-    fontSize: {
-      xs: '11px',
-      sm: '12px',
-      md: '13px',
-    },
-    border: '1px solid #e0e0e0',
+    fontSize: { xs: '12px', sm: '13px', md: '14px' },
+    borderBottom: '1px solid #eee',
+    borderRight: '1px solid #f0f0f0',
+    color: '#444',
+    py: 1.3,
     whiteSpace: 'nowrap',
-  },
-
-  selectStatus: {
-    minWidth: 120,
-    textTransform: 'capitalize',
-    fontSize: {
-      xs: '12px',
-      sm: '13px',
-      md: '14px',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 245, 245, 0.3)',
     },
   },
 
+  // 🔶 Row Hover (apply inside TableRow if needed)
+  tableRowHover: {
+    '&:hover': {
+      backgroundColor: '#fff5f5',
+      transition: 'background-color 0.3s ease',
+    },
+  },
+
+  // 🔶 Status Dots
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: '50%',
+    display: 'inline-block',
+    transition: 'all 0.3s ease',
+  },
+  statusDotActive: {
+    backgroundColor: '#43a047', // success green
+    boxShadow: '0 0 6px rgba(67,160,71,0.6)',
+  },
+  statusDotInactive: {
+    backgroundColor: '#e53935', // red
+    boxShadow: '0 0 6px rgba(229,57,53,0.5)',
+  },
+
+  // 🔶 Action Buttons
+  actionButtonEdit: {
+    background: 'linear-gradient(135deg, #1565c0, #42a5f5)',
+    color: '#fff',
+    fontWeight: 600,
+    borderRadius: '8px',
+    textTransform: 'none',
+    '&:hover': {
+      background: 'linear-gradient(135deg, #0d47a1, #2196f3)',
+      transform: 'translateY(-1px)',
+    },
+  },
+  actionButtonDelete: {
+    borderColor: '#e53935',
+    color: '#e53935',
+    fontWeight: 600,
+    textTransform: 'none',
+    borderRadius: '8px',
+    '&:hover': {
+      backgroundColor: '#ffebee',
+      borderColor: '#b71c1c',
+      color: '#b71c1c',
+    },
+  },
+
+  // 🔶 Pagination
   pagination: {
-    mt: 3,
+    mt: 4,
     display: 'flex',
     justifyContent: 'center',
-  },
-
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: '50%',
-  },
-
-  statusDotActive: {
-    backgroundColor: 'success.main',
-  },
-
-  statusDotInactive: {
-    backgroundColor: 'error.main',
+    '& .MuiPaginationItem-root': {
+      borderRadius: '8px',
+      color: '#b71c1c',
+      fontWeight: 500,
+      '&.Mui-selected': {
+        backgroundColor: '#d32f2f',
+        color: '#fff',
+        boxShadow: '0 3px 10px rgba(211,47,47,0.3)',
+        '&:hover': {
+          backgroundColor: '#b71c1c',
+        },
+      },
+    },
   },
 };
 

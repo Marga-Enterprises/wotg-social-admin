@@ -15,7 +15,11 @@ import {
   Stack,
   Typography,
   Box,
+  Divider,
 } from '@mui/material';
+
+// styles
+import styles from './styles';
 
 const AddBlogFormModal = ({
   open,
@@ -33,16 +37,19 @@ const AddBlogFormModal = ({
 
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
-
     onThumbnailUpload(file);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>Add New Blog</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth PaperProps={{ sx: styles.dialogPaper }}>
+      <DialogTitle sx={styles.dialogTitle}>
+        Add New Blog
+      </DialogTitle>
 
-      <DialogContent dividers>
-        <Stack spacing={3} mt={1}>
+      <Divider sx={styles.divider} />
+
+      <DialogContent dividers sx={styles.dialogContent}>
+        <Stack spacing={4}>
           {/* Blog Title */}
           <TextField
             label="Blog Title"
@@ -51,29 +58,18 @@ const AddBlogFormModal = ({
             onChange={onInputChange}
             fullWidth
             required
+            sx={styles.textField}
           />
 
           {/* Blog Intro */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle1" sx={styles.sectionLabel}>
               Blog Intro
             </Typography>
             <Editor
-              apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j" // ✅ free for self-hosted usage
+              apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j"
               value={formValues.blog_intro || ''}
-              init={{
-                height: 600,
-                menubar: true,
-                plugins: [
-                  'advlist autolink lists link image charmap preview anchor',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media table paste code help wordcount',
-                ],
-                toolbar:
-                  'undo redo | formatselect | bold italic underline | \
-                   alignleft aligncenter alignright alignjustify | \
-                   bullist numlist outdent indent | removeformat | help',
-              }}
+              init={styles.editorIntro}
               onEditorChange={(content) =>
                 onInputChange({
                   target: { name: 'blog_intro', value: content },
@@ -84,25 +80,13 @@ const AddBlogFormModal = ({
 
           {/* Blog Body */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle1" sx={styles.sectionLabel}>
               Blog Body
             </Typography>
             <Editor
               apiKey="etmgui2r438xkf0wrvprltzrgwj1mpjly6f7em9i21lrx44j"
               value={formValues.blog_body || ''}
-              init={{
-                height: 600,
-                menubar: true,
-                plugins: [
-                  'advlist autolink lists link image charmap preview anchor',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media table paste code help wordcount',
-                ],
-                toolbar:
-                  'undo redo | formatselect | bold italic underline | \
-                   alignleft aligncenter alignright alignjustify | \
-                   bullist numlist outdent indent | removeformat | help',
-              }}
+              init={styles.editorBody}
               onEditorChange={(content) =>
                 onInputChange({
                   target: { name: 'blog_body', value: content },
@@ -121,40 +105,41 @@ const AddBlogFormModal = ({
             fullWidth
             required
             InputLabelProps={{ shrink: true }}
+            sx={styles.textField}
           />
 
           {/* Blog Thumbnail Upload */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle1" sx={styles.sectionLabel}>
               Blog Thumbnail
             </Typography>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ marginBottom: '10px' }}
-            />
-            {previewUrl && (
-              <img
-                src={previewUrl}
-                alt="Preview"
-                style={{
-                  width: '100%',
-                  borderRadius: 8,
-                  maxHeight: 500,
-                  objectFit: 'cover',
-                }}
+            <Box sx={styles.uploadBox}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                id="thumbnail-upload"
+                style={{ display: 'none' }}
               />
-            )}
+              <label htmlFor="thumbnail-upload">
+                <Button variant="outlined" component="span" sx={styles.uploadBtn}>
+                  Upload Image
+                </Button>
+              </label>
+
+              {previewUrl && (
+                <img src={previewUrl} alt="Preview" style={styles.previewImage} />
+              )}
+            </Box>
           </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
+      <DialogActions sx={styles.dialogActions}>
+        <Button onClick={onClose} sx={styles.cancelBtn}>
           Cancel
         </Button>
-        <Button onClick={onSubmit} variant="contained" color="primary">
+        <Button onClick={onSubmit} variant="contained" sx={styles.saveBtn}>
           Save Blog
         </Button>
       </DialogActions>

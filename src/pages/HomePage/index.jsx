@@ -7,11 +7,20 @@ import { Link } from 'react-router-dom';
 // options
 import options from './options';
 
-// mui stylings
+// styles
 import styles from './styles';
 
 const Page = () => (
   <Box sx={styles.outerBox}>
+    <Box sx={styles.headerBox}>
+      <Typography variant="h4" sx={styles.headerTitle}>
+        Welcome to Your Dashboard
+      </Typography>
+      <Typography variant="body1" sx={styles.headerSubtitle}>
+        Choose a section below to manage your content
+      </Typography>
+    </Box>
+
     <Box sx={styles.wrapperBox}>
       {options.map((option, index) => {
         const Icon = option.icon;
@@ -20,10 +29,10 @@ const Page = () => (
             key={index}
             component={Link}
             to={option.path}
-            sx={styles.cardBox} // ✅ no more (option.color)
+            sx={styles.cardBox}
           >
-            <Icon sx={{ fontSize: 60 }} />
-            <Typography variant="h6" mt={2}>
+            <Icon sx={styles.cardIcon} />
+            <Typography variant="h6" sx={styles.cardLabel}>
               {option.label}
             </Typography>
           </Box>
