@@ -20,11 +20,11 @@ import {
   Button,
 } from '@mui/material';
 
-// styles
-import styles from './styles';
-
 // components
 import LoadingScreen from '@components/common/LoadingScreen';
+
+// styles
+import styles from './styles';
 
 const cdnUrl = 'https://wotg.sgp1.cdn.digitaloceanspaces.com/';
 
@@ -43,16 +43,29 @@ const PostsTableSection = ({
   return (
     <Box sx={styles.root}>
       {/* Header */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Post Management</Typography>
-        <Button variant="contained" onClick={openAddPostModal}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={styles.headerWrapper}
+      >
+        <Box>
+          <Typography variant="h6" sx={styles.headerTitle}>
+            Post Management
+          </Typography>
+          <Typography variant="body2" sx={styles.headerSubtitle}>
+            View, edit, and schedule all community posts and media updates.
+          </Typography>
+        </Box>
+
+        <Button variant="contained" sx={styles.addButton} onClick={openAddPostModal}>
           + Create New Post
         </Button>
       </Stack>
 
       {/* Table */}
       <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table size="small">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>Media</TableCell>
@@ -65,42 +78,42 @@ const PostsTableSection = ({
           <TableBody>
             {posts.length > 0 ? (
               posts.map((post) => {
-                // Pick the most recent media (by created_at)
-                let latestMedia = null;
-                if (post.media && post.media.length > 0) {
-                  latestMedia = [...post.media].sort(
-                    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-                  )[0];
-                }
+                const latestMedia =
+                  post.media && post.media.length > 0
+                    ? [...post.media].sort(
+                        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+                      )[0]
+                    : null;
 
-                // Construct CDN URL if media exists
                 let mediaUrl = null;
                 if (latestMedia) {
-                  if (latestMedia.type === 'video') {
-                    mediaUrl = `${cdnUrl}videos/${latestMedia.url}`;
-                  } else if (latestMedia.type === 'image') {
-                    mediaUrl = `${cdnUrl}images/${latestMedia.url}`;
-                  }
+                  const folder =
+                    latestMedia.type === 'video'
+                      ? 'videos'
+                      : latestMedia.type === 'image'
+                      ? 'images'
+                      : '';
+                  mediaUrl = `${cdnUrl}${folder}/${latestMedia.url}`;
                 }
 
                 return (
-                  <TableRow key={post.id} hover>
+                  <TableRow key={post.id} hover sx={styles.tableRow}>
                     {/* Media */}
                     <TableCell sx={{ ...styles.tableBodyCell, ...styles.mediaCell }}>
-                      {latestMedia ? (
+                      {mediaUrl ? (
                         latestMedia.type === 'video' ? (
                           <Box
                             component="video"
                             src={mediaUrl}
                             controls
-                            sx={styles.mediaPreview}   // ⬅️ use central style
+                            sx={styles.mediaPreview}
                           />
                         ) : (
                           <Box
                             component="img"
                             src={mediaUrl}
                             alt="Post Media"
-                            sx={styles.mediaPreview}   // ⬅️ use central style
+                            sx={styles.mediaPreview}
                           />
                         )
                       ) : (
@@ -110,17 +123,20 @@ const PostsTableSection = ({
                       )}
                     </TableCell>
 
-                    {/* Content */}
+                    {/* Caption */}
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="body2">
-                        {post.content ? post.content.substring(0, 300) : 'No content'}
-                        {post.content && post.content.length > 300 ? '...' : ''}
+                      <Typography variant="body2" sx={styles.captionText}>
+                        {post.content
+                          ? post.content.length > 300
+                            ? `${post.content.substring(0, 300)}…`
+                            : post.content
+                          : 'No caption'}
                       </Typography>
                     </TableCell>
 
                     {/* Release Date */}
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={styles.dateText}>
                         {post.release_date
                           ? new Date(post.release_date).toLocaleDateString('en-US', {
                               year: 'numeric',
@@ -133,10 +149,11 @@ const PostsTableSection = ({
 
                     {/* Actions */}
                     <TableCell sx={styles.tableBodyCell}>
-                      <Stack direction="row" spacing={1}>
+                      <Stack direction="row" spacing={1.2}>
                         <Button
                           variant="contained"
                           size="small"
+                          sx={styles.editButton}
                           component={RouterLink}
                           onClick={() => onOpenEditPostModal(post.id)}
                         >
@@ -144,8 +161,9 @@ const PostsTableSection = ({
                         </Button>
                         <Button
                           variant="outlined"
-                          color="error"
                           size="small"
+                          color="error"
+                          sx={styles.deleteButton}
                           onClick={() => onDeletePost(post.id)}
                         >
                           Delete
@@ -157,8 +175,10 @@ const PostsTableSection = ({
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center" sx={styles.tableBodyCell}>
-                  No posts found.
+                <TableCell colSpan={4} align="center" sx={styles.tableBodyCell}>
+                  <Typography variant="body2" color="text.secondary">
+                    No posts found.
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -171,7 +191,6 @@ const PostsTableSection = ({
         count={totalPages}
         page={page}
         onChange={(e, value) => onPageChange(value)}
-        color="primary"
         sx={styles.pagination}
       />
     </Box>

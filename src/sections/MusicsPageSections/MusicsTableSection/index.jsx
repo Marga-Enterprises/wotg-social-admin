@@ -49,15 +49,14 @@ const MusicsTableSection = ({
 
   return (
     <Box sx={styles.root}>
-      {/* Header section with Add Music button */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Music Management</Typography>
-        <Button variant="contained" onClick={openAddMusicModal}>
-          + Create New Music
+      {/* 🎵 Header */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+        <Button variant="contained" sx={styles.addButton} onClick={openAddMusicModal}>
+          + Add New Music
         </Button>
       </Stack>
 
-      {/* Table */}
+      {/* 🎶 Music Table */}
       <TableContainer component={Paper} sx={styles.tableContainer}>
         <Table size="small">
           <TableHead>
@@ -66,60 +65,80 @@ const MusicsTableSection = ({
               <TableCell sx={styles.tableHeadCell}>Title</TableCell>
               <TableCell sx={styles.tableHeadCell}>Artist</TableCell>
               <TableCell sx={styles.tableHeadCell}>Genre</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Duration</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Plays</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Duration
+              </TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Plays
+              </TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {musics.length > 0 ? (
               musics.map((music) => (
-                <TableRow key={music.id} hover>
+                <TableRow key={music.id} hover sx={styles.tableRow}>
                   {/* Thumbnail */}
                   <TableCell sx={styles.tableBodyCell}>
                     <Avatar
                       variant="rounded"
                       alt={music.title}
                       src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${music.Album.cover_image}`}
-                      sx={{ width: 56, height: 56 }}
+                      sx={styles.thumbnail}
                     />
                   </TableCell>
 
                   {/* Title */}
                   <TableCell sx={styles.tableBodyCell}>
-                    <Typography variant="subtitle2">{music.title}</Typography>
+                    <Typography variant="subtitle2" sx={styles.titleText}>
+                      {music.title}
+                    </Typography>
                   </TableCell>
 
                   {/* Artist */}
                   <TableCell sx={styles.tableBodyCell}>
                     <Typography variant="body2" color="text.secondary">
-                      {music.artist_name}
+                      {music.artist_name || '—'}
                     </Typography>
                   </TableCell>
 
                   {/* Genre */}
                   <TableCell sx={styles.tableBodyCell}>
-                    {music.genre || '-'}
+                    {music.genre ? (
+                      <Chip
+                        label={music.genre}
+                        size="small"
+                        sx={styles.genreChip}
+                      />
+                    ) : (
+                      <Typography variant="body2" color="text.disabled">
+                        —
+                      </Typography>
+                    )}
                   </TableCell>
 
                   {/* Duration */}
-                  <TableCell sx={styles.tableBodyCell}>
+                  <TableCell sx={styles.tableBodyCell} align="center">
                     {formatDuration(music.duration)}
                   </TableCell>
 
                   {/* Plays */}
-                  <TableCell sx={styles.tableBodyCell}>
-                    {music.play_count}
+                  <TableCell sx={styles.tableBodyCell} align="center">
+                    <Typography sx={styles.playCount}>
+                      {music.play_count.toLocaleString()}
+                    </Typography>
                   </TableCell>
 
                   {/* Actions */}
-                  <TableCell sx={styles.tableBodyCell}>
-                    <Stack direction="row" spacing={1}>
+                  <TableCell sx={styles.tableBodyCell} align="center">
+                    <Stack direction="row" justifyContent="center" spacing={1}>
                       <Button
                         variant="contained"
                         size="small"
-                        component={RouterLink}
+                        sx={styles.editButton}
                         onClick={() => onOpenEditMusicModal(music.id)}
                       >
                         Edit
@@ -128,6 +147,7 @@ const MusicsTableSection = ({
                         variant="outlined"
                         color="error"
                         size="small"
+                        sx={styles.deleteButton}
                         onClick={() => onDeleteMusic(music.id)}
                       >
                         Delete
@@ -138,8 +158,10 @@ const MusicsTableSection = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} align="center" sx={styles.tableBodyCell}>
-                  No musics found.
+                <TableCell colSpan={7} align="center" sx={styles.noDataCell}>
+                  <Typography variant="body2" color="text.secondary">
+                    No music tracks found.
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -147,7 +169,7 @@ const MusicsTableSection = ({
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
+      {/* 🎧 Pagination */}
       <Pagination
         count={totalPages}
         page={page}

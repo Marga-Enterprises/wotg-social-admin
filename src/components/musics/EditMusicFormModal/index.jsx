@@ -15,6 +15,9 @@ import {
   MenuItem,
 } from '@mui/material';
 
+// styles
+import styles from './styles';
+
 const EditMusicFormModal = ({
   open,
   onClose,
@@ -26,7 +29,7 @@ const EditMusicFormModal = ({
 }) => {
   const [audioPreview, setAudioPreview] = useState(null);
 
-  // Reset preview when modal opens with different music
+  // Load existing track if available
   useEffect(() => {
     if (open) {
       if (formValues.audio_url) {
@@ -39,11 +42,9 @@ const EditMusicFormModal = ({
     }
   }, [open, formValues.audio_url]);
 
-  // Clear preview when modal closes
+  // Reset preview when closing
   useEffect(() => {
-    if (!open) {
-      setAudioPreview(null);
-    }
+    if (!open) setAudioPreview(null);
   }, [open]);
 
   // Handle audio upload
@@ -53,24 +54,32 @@ const EditMusicFormModal = ({
 
     const audioUrl = URL.createObjectURL(file);
     setAudioPreview(audioUrl);
-
-    onAudioUpload(file); // parent handles saving
+    onAudioUpload(file);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit New Music</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{ sx: styles.dialogPaper }}
+    >
+      {/* 🎵 Header */}
+      <DialogTitle sx={styles.dialogTitle}>Edit Music</DialogTitle>
 
-      <DialogContent dividers>
+      {/* 🧩 Content */}
+      <DialogContent dividers sx={styles.dialogContent}>
         <Stack spacing={3} mt={1}>
           {/* Title */}
           <TextField
-            label="Title"
+            label="Music Title"
             name="title"
             value={formValues.title || ''}
             onChange={onInputChange}
             fullWidth
             required
+            sx={styles.textField}
           />
 
           {/* Genre */}
@@ -80,9 +89,10 @@ const EditMusicFormModal = ({
             value={formValues.genre || ''}
             onChange={onInputChange}
             fullWidth
+            sx={styles.textField}
           />
 
-          {/* Album select */}
+          {/* Album */}
           <TextField
             select
             label="Album"
@@ -90,6 +100,7 @@ const EditMusicFormModal = ({
             value={formValues.album_id || ''}
             onChange={onInputChange}
             fullWidth
+            sx={styles.textField}
           >
             <MenuItem value="">None</MenuItem>
             {albums.map((album) => (
@@ -99,30 +110,44 @@ const EditMusicFormModal = ({
             ))}
           </TextField>
 
-          {/* Audio upload */}
+          {/* Audio Upload */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Audio File
+            <Typography variant="subtitle2" sx={styles.label}>
+              Replace Audio File
             </Typography>
+
             <input
               type="file"
               accept="audio/*"
               onChange={handleAudioChange}
-              style={{ marginBottom: '10px' }}
+              style={styles.fileInput}
             />
-            {audioPreview && (
-              <audio controls src={audioPreview} style={{ width: '100%' }} />
+
+            {audioPreview ? (
+              <Box sx={styles.audioPreviewBox}>
+                <Typography variant="body2" sx={styles.currentTrackLabel}>
+                  Preview Track
+                </Typography>
+                <audio controls src={audioPreview} style={styles.audioPlayer} />
+              </Box>
+            ) : (
+              <Box sx={styles.audioPlaceholder}>
+                <Typography variant="body2" color="text.secondary">
+                  No audio selected
+                </Typography>
+              </Box>
             )}
           </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
+      {/* ⚙️ Actions */}
+      <DialogActions sx={styles.dialogActions}>
+        <Button onClick={onClose} sx={styles.cancelButton}>
           Cancel
         </Button>
-        <Button onClick={onSubmit} variant="contained" color="primary">
-          Save
+        <Button onClick={onSubmit} variant="contained" sx={styles.saveButton}>
+          Save Changes
         </Button>
       </DialogActions>
     </Dialog>

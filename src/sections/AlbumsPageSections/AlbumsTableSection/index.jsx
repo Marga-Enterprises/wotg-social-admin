@@ -1,9 +1,6 @@
 // react
 import React from 'react';
 
-// react-router-dom
-import { Link as RouterLink } from 'react-router-dom';
-
 // mui
 import {
   Box,
@@ -21,107 +18,126 @@ import {
   Avatar,
 } from '@mui/material';
 
-// styles
-import styles from './styles';
+// react-router
+import { Link as RouterLink } from 'react-router-dom';
 
 // components
 import LoadingScreen from '@components/common/LoadingScreen';
 
+// styles
+import styles from './styles';
+
 const AlbumsTableSection = ({
-  albums,
-  loading,
-  page,
-  totalPages,
+  albums = [],
+  loading = false,
+  page = 1,
+  totalPages = 1,
   openAddAlbumModal,
   onDeleteAlbum,
   onOpenEditAlbumModal,
   onPageChange,
 }) => {
+  // 🔹 Show loader if fetching
   if (loading) return <LoadingScreen />;
+
+  // 🔹 Render table rows
+  const renderTableRows = () => {
+    if (albums.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={3} align="center" sx={styles.tableBodyCell}>
+            No albums found.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return albums.map(({ id, title, cover_image }) => (
+      <TableRow key={id} hover sx={styles.tableRowHover}>
+        {/* Thumbnail */}
+        <TableCell sx={styles.tableBodyCell}>
+          <Avatar
+            variant="rounded"
+            alt={title}
+            src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${cover_image}`}
+            sx={{ width: 56, height: 56 }}
+          />
+        </TableCell>
+
+        {/* Title */}
+        <TableCell sx={styles.tableBodyCell}>
+          <Typography variant="subtitle2" noWrap>
+            {title}
+          </Typography>
+        </TableCell>
+
+        {/* Actions */}
+        <TableCell sx={styles.tableBodyCell}>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="contained"
+              size="small"
+              sx={styles.actionButtonEdit}
+              onClick={() => onOpenEditAlbumModal(id)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              sx={styles.actionButtonDelete}
+              onClick={() => onDeleteAlbum(id)}
+            >
+              Delete
+            </Button>
+          </Stack>
+        </TableCell>
+      </TableRow>
+    ));
+  };
 
   return (
     <Box sx={styles.root}>
-      {/* Header section with Add Album button */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6">Album Management</Typography>
-        <Button variant="contained" onClick={openAddAlbumModal}>
+      {/* 🔹 Header */}
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={styles.header}
+      >
+        <Button
+          variant="contained"
+          onClick={openAddAlbumModal}
+          sx={styles.addButton}
+        >
           + Create New Album
         </Button>
       </Stack>
 
-      {/* Table */}
+      {/* 🔹 Table */}
       <TableContainer component={Paper} sx={styles.tableContainer}>
         <Table size="small">
-            <TableHead>
-                <TableRow>
-                    <TableCell sx={styles.tableHeadCell}>Thumbnail</TableCell>
-                    <TableCell sx={styles.tableHeadCell}>Title</TableCell>
-                    <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
-                </TableRow>
-            </TableHead>
+          <TableHead>
+            <TableRow>
+              <TableCell sx={styles.tableHeadCell}>Thumbnail</TableCell>
+              <TableCell sx={styles.tableHeadCell}>Title</TableCell>
+              <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
 
-            <TableBody>
-                {albums.length > 0 ? (
-                    albums.map((album) => (
-                    <TableRow key={album.id} hover>
-                        {/* Thumbnail */}
-                        <TableCell sx={styles.tableBodyCell}>
-                            <Avatar
-                                variant="rounded"
-                                alt={album.title}
-                                src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${album.cover_image}`}
-                                sx={{ width: 56, height: 56 }}
-                            />
-                        </TableCell>
-
-                        {/* Title */}
-                        <TableCell sx={styles.tableBodyCell}>
-                            <Typography variant="subtitle2">{album.title}</Typography>
-                        </TableCell>
-
-                        {/* Actions */}
-                        <TableCell sx={styles.tableBodyCell}>
-                            <Stack direction="row" spacing={1}>
-                                <Button
-                                    variant="contained"
-                                    size="small"
-                                    component={RouterLink}
-                                    onClick={() => onOpenEditAlbumModal(album.id)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => onDeleteAlbum(album.id)}
-                                >
-                                    Delete
-                                </Button>
-                            </Stack>
-                        </TableCell>
-                    </TableRow>
-                    ))
-                ) : (
-                    <TableRow>
-                        <TableCell colSpan={3} align="center" sx={styles.tableBodyCell}>
-                            No albums found.
-                        </TableCell>
-                    </TableRow>
-                )}
-            </TableBody>
+          <TableBody>{renderTableRows()}</TableBody>
         </Table>
       </TableContainer>
 
-
-      {/* Pagination */}
-      <Pagination
-        count={totalPages}
-        page={page}
-        onChange={(e, value) => onPageChange(value)} // ✅ syncs state + URL
-        color="primary"
-        sx={styles.pagination}
-      />
+      {/* 🔹 Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(e, value) => onPageChange(value)}
+          sx={styles.pagination}
+        />
+      )}
     </Box>
   );
 };

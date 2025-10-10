@@ -15,6 +15,9 @@ import {
   MenuItem,
 } from '@mui/material';
 
+// styles
+import styles from './styles';
+
 const AddMusicFormModal = ({
   open,
   onClose,
@@ -26,31 +29,38 @@ const AddMusicFormModal = ({
 }) => {
   const [audioPreview, setAudioPreview] = useState(null);
 
-  // Handle audio upload
   const handleAudioChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const audioUrl = URL.createObjectURL(file);
     setAudioPreview(audioUrl);
-
-    onAudioUpload(file); // parent handles saving
+    onAudioUpload(file);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New Music</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{ sx: styles.dialogPaper }}
+    >
+      {/* 🎵 Header */}
+      <DialogTitle sx={styles.dialogTitle}>Add New Music</DialogTitle>
 
-      <DialogContent dividers>
+      {/* 🧩 Form Content */}
+      <DialogContent dividers sx={styles.dialogContent}>
         <Stack spacing={3} mt={1}>
           {/* Title */}
           <TextField
-            label="Title"
+            label="Music Title"
             name="title"
             value={formValues.title || ''}
             onChange={onInputChange}
             fullWidth
             required
+            sx={styles.textField}
           />
 
           {/* Genre */}
@@ -60,9 +70,10 @@ const AddMusicFormModal = ({
             value={formValues.genre || ''}
             onChange={onInputChange}
             fullWidth
+            sx={styles.textField}
           />
 
-          {/* Album select */}
+          {/* Album */}
           <TextField
             select
             label="Album"
@@ -70,6 +81,7 @@ const AddMusicFormModal = ({
             value={formValues.album_id || ''}
             onChange={onInputChange}
             fullWidth
+            sx={styles.textField}
           >
             <MenuItem value="">None</MenuItem>
             {albums.map((album) => (
@@ -79,30 +91,40 @@ const AddMusicFormModal = ({
             ))}
           </TextField>
 
-          {/* Audio upload */}
+          {/* Audio Upload */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle2" sx={styles.label}>
               Audio File
             </Typography>
             <input
               type="file"
               accept="audio/*"
               onChange={handleAudioChange}
-              style={{ marginBottom: '10px' }}
+              style={styles.fileInput}
             />
-            {audioPreview && (
-              <audio controls src={audioPreview} style={{ width: '100%' }} />
+
+            {audioPreview ? (
+              <Box sx={styles.audioPreviewBox}>
+                <audio controls src={audioPreview} style={styles.audioPlayer} />
+              </Box>
+            ) : (
+              <Box sx={styles.audioPlaceholder}>
+                <Typography variant="body2" color="text.secondary">
+                  No audio selected
+                </Typography>
+              </Box>
             )}
           </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
+      {/* ⚙️ Actions */}
+      <DialogActions sx={styles.dialogActions}>
+        <Button onClick={onClose} sx={styles.cancelButton}>
           Cancel
         </Button>
-        <Button onClick={onSubmit} variant="contained" color="primary">
-          Save
+        <Button onClick={onSubmit} variant="contained" sx={styles.saveButton}>
+          Save Music
         </Button>
       </DialogActions>
     </Dialog>

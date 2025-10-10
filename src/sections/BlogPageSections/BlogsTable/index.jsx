@@ -127,10 +127,6 @@ const BlogsTableSection = ({
     <Box sx={styles.root}>
       {/* 🔹 Header Section */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: '#b71c1c' }}>
-          Blog Management
-        </Typography>
-
         <Button variant="contained" sx={styles.addButton} onClick={openAddBlogModal}>
           + Create New Blog
         </Button>

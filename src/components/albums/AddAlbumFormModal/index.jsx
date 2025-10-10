@@ -15,6 +15,9 @@ import {
   Avatar,
 } from '@mui/material';
 
+// styles
+import styles from './styles';
+
 const AddAlbumFormModal = ({
   open,
   onClose,
@@ -31,55 +34,73 @@ const AddAlbumFormModal = ({
 
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
-
-    onThumbnailUpload(file); // parent handles saving
+    onThumbnailUpload(file);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New Album</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{ sx: styles.dialogPaper }}
+    >
+      {/* 🔹 Header */}
+      <DialogTitle sx={styles.dialogTitle}>Add New Album</DialogTitle>
 
-      <DialogContent dividers>
+      {/* 🔹 Content */}
+      <DialogContent dividers sx={styles.dialogContent}>
         <Stack spacing={3} mt={1}>
-          {/* Title */}
+          {/* Album Title */}
           <TextField
-            label="Title"
+            label="Album Title"
             name="title"
             value={formValues.title || ''}
             onChange={onInputChange}
             fullWidth
             required
+            sx={styles.textField}
           />
 
           {/* Cover Image Upload */}
           <Box>
-            <Typography variant="subtitle2" gutterBottom>
+            <Typography variant="subtitle2" sx={styles.label}>
               Cover Image
             </Typography>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ marginBottom: '10px' }}
-            />
-            {previewUrl && (
-              <Avatar
-                variant="rounded"
-                src={previewUrl}
-                alt="Preview"
-                sx={{ width: 120, height: 120 }}
+
+            <Box sx={styles.uploadBox}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={styles.fileInput}
               />
-            )}
+              {previewUrl ? (
+                <Avatar
+                  variant="rounded"
+                  src={previewUrl}
+                  alt="Album Cover Preview"
+                  sx={styles.avatarPreview}
+                />
+              ) : (
+                <Box sx={styles.placeholderBox}>
+                  <Typography variant="body2" sx={{ color: '#888' }}>
+                    No image selected
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Stack>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
+      {/* 🔹 Actions */}
+      <DialogActions sx={styles.dialogActions}>
+        <Button onClick={onClose} sx={styles.cancelButton}>
           Cancel
         </Button>
-        <Button onClick={onSubmit} variant="contained" color="primary">
-          Save
+        <Button onClick={onSubmit} variant="contained" sx={styles.saveButton}>
+          Save Album
         </Button>
       </DialogActions>
     </Dialog>
