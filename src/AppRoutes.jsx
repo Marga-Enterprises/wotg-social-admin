@@ -13,6 +13,7 @@ import EditBlogPage from '@pages/EditBlogPage';
 import AlbumsPage from '@pages/AlbumsPage';
 import MusicsPage from '@pages/MusicsPage';
 import PostsPage from '@pages/PostsPage';
+import UsersPage from '@pages/UsersPage';
 
 // layout
 import MainLayout from '@components/layout/MainLayout';
@@ -95,6 +96,17 @@ function AppRoutes() {
         }
       >
         <Route index element={<PostsPage />} />
+      </Route>
+
+      <Route
+        path="/users"
+        element={
+          <AuthRouter>
+            <MainLayout />
+          </AuthRouter>
+        }
+      >
+        <Route index element={<UsersPage />} />
       </Route>
     </Routes>
   );

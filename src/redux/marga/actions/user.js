@@ -1,5 +1,9 @@
 // API
-import { loginService } from '@services/api/user';
+import { 
+  loginService,
+  fetchUsersService,
+  fetchUserDetailService 
+} from '@services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -69,5 +73,27 @@ export const logoutAction = () => (dispatch) => {
     dispatch({ type: 'USER_LOGOUT' });
   } catch (err) {
     console.error('Logout error:', err);
+  }
+};
+
+
+// Fetch Users
+export const fetchUsersAction = (payload) => async () => {
+  try {
+    const res = await fetchUsersService(payload);
+    return res;
+  } catch (err) {
+    return { error: err.response?.data?.msg };
+  }
+};
+
+
+// Fetch User Detail
+export const fetchUserDetailAction = (userId) => async () => {
+  try {
+    const res = await fetchUserDetailService(userId);
+    return res;
+  } catch (err) {
+    return { error: err.response?.data?.msg };
   }
 };

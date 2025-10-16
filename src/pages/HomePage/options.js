@@ -2,6 +2,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
 import PostAddIcon from '@mui/icons-material/PostAdd';
+import PeopleIcon from '@mui/icons-material/People'; // ✅ added
 
 const options = [
   {
@@ -27,6 +28,12 @@ const options = [
     icon: PostAddIcon,
     color: '#f57c00',
     path: '/posts',
+  },
+  {
+    label: 'Users',
+    icon: PeopleIcon,
+    color: '#7b1fa2', // ✅ added distinctive purple tone
+    path: '/users',
   },
 ];
 
