@@ -18,17 +18,21 @@ import UsersTableSection from '@sections/UsersPageSections/UsersTableSection';
 import UsersFiltersSection from '@sections/UsersPageSections/UsersFiltersSection';
 
 const Page = () => {
-  // hooks
   const location = useLocation();
   const navigate = useNavigate();
 
-  // logic hooks
-  const { users, loading, pageDetails, handleFetchUsers } = useLogic();
+  // pass navigate + location into logic
+  const {
+    users,
+    loading,
+    pageDetails,
+    handleFetchUsers,
+    handleFilterChange,
+  } = useLogic(navigate, location);
 
-  // 🔄 load users on page load or when query changes
+  // 🔄 Fetch users when query params change
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-
     const currentPage = parseInt(queryParams.get('page')) || 1;
     const search = queryParams.get('search') || '';
     const guestAccount = queryParams.get('guestAccount') || 'both';
@@ -37,17 +41,6 @@ const Page = () => {
 
     handleFetchUsers(currentPage, search, guestAccount, dateFrom, dateTo);
   }, [location.search, handleFetchUsers]);
-
-  // 🧠 handle filters update
-  const handleFilterChange = (filters) => {
-    const params = new URLSearchParams(location.search);
-    params.set('page', 1); // reset to first page
-    params.set('search', filters.search || '');
-    params.set('guestAccount', filters.guestAccount || 'both');
-    params.set('dateFrom', filters.dateFrom || '');
-    params.set('dateTo', filters.dateTo || '');
-    navigate(`?${params.toString()}`);
-  };
 
   return (
     <Box sx={styles.container}>
@@ -61,7 +54,7 @@ const Page = () => {
         </Typography>
       </Stack>
 
-      {/* 🔍 Filters Section */}
+      {/* 🔍 Filters */}
       <UsersFiltersSection
         onFilterChange={handleFilterChange}
         initialFilters={{

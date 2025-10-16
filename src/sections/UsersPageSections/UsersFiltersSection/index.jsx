@@ -24,21 +24,40 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
     dateTo: initialFilters?.dateTo || '',
   });
 
-  // ✅ run only when filters object actually changes (deep compare workaround)
+  // ✅ Sync state if URL filters change
   useEffect(() => {
-    onFilterChange({ ...filters });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.search, filters.guestAccount, filters.dateFrom, filters.dateTo]);
+    setFilters({
+      search: initialFilters?.search || '',
+      guestAccount: initialFilters?.guestAccount || 'both',
+      dateFrom: initialFilters?.dateFrom || '',
+      dateTo: initialFilters?.dateTo || '',
+    });
+  }, [initialFilters]);
 
-  // ✅ make sure setFilters always runs with a new reference
+  // ✅ Trigger for filters (except search)
+  useEffect(() => {
+    onFilterChange({
+      search: filters.search,
+      guestAccount: filters.guestAccount,
+      dateFrom: filters.dateFrom,
+      dateTo: filters.dateTo,
+      trigger: 'auto',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.guestAccount, filters.dateFrom, filters.dateTo]);
+
+  // ✅ Handle all field updates
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => {
-      const updated = { ...prev, [name]: value };
-      return updated;
-    });
+    setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Search only triggers manually
+  const handleSearchClick = () => {
+    onFilterChange({ ...filters, trigger: 'manual' });
+  };
+
+  // ✅ Reset all filters
   const handleReset = () => {
     const reset = {
       search: '',
@@ -47,22 +66,38 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
       dateTo: '',
     };
     setFilters(reset);
+    onFilterChange({ ...reset, trigger: 'reset' });
   };
 
   return (
     <Box sx={styles.root}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" flexWrap="wrap">
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        alignItems="center"
+        flexWrap="wrap"
+      >
         {/* 🔍 Search */}
-        <TextField
-          label="Search"
-          name="search"
-          value={filters.search}
-          onChange={handleChange}
-          placeholder="Search by name or email"
-          variant="outlined"
-          size="small"
-          sx={styles.searchField}
-        />
+        <Stack direction="row" spacing={1} alignItems="center">
+          <TextField
+            label="Search"
+            name="search"
+            value={filters.search}
+            onChange={handleChange}
+            placeholder="Search by name or email"
+            variant="outlined"
+            size="small"
+            sx={styles.searchField}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSearchClick}
+            sx={styles.searchButton}
+          >
+            Search
+          </Button>
+        </Stack>
 
         {/* 👤 Guest Filter */}
         <FormControl size="small" sx={styles.selectField}>
@@ -101,7 +136,12 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
           InputLabelProps={{ shrink: true }}
         />
 
-        <Button variant="outlined" color="error" onClick={handleReset} sx={styles.resetButton}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleReset}
+          sx={styles.resetButton}
+        >
           Reset
         </Button>
       </Stack>
