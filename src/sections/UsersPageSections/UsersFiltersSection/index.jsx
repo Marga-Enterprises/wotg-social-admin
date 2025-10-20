@@ -1,7 +1,4 @@
-// react
 import React, { useState, useEffect } from 'react';
-
-// mui
 import {
   Box,
   Stack,
@@ -12,58 +9,53 @@ import {
   MenuItem,
   Button,
 } from '@mui/material';
-
-// styles
 import styles from './styles';
 
 const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
+  // 🗓️ Default date = today's date (YYYY-MM-DD)
+  const today = new Date().toISOString().split('T')[0];
+
   const [filters, setFilters] = useState({
     search: initialFilters?.search || '',
     guestAccount: initialFilters?.guestAccount || 'both',
-    dateFrom: initialFilters?.dateFrom || '',
-    dateTo: initialFilters?.dateTo || '',
+    dateFrom: initialFilters?.dateFrom || today,
+    dateTo: initialFilters?.dateTo || today,
   });
 
-  // ✅ Sync state if URL filters change
+  // ✅ Sync state when URL filters change
   useEffect(() => {
     setFilters({
       search: initialFilters?.search || '',
       guestAccount: initialFilters?.guestAccount || 'both',
-      dateFrom: initialFilters?.dateFrom || '',
-      dateTo: initialFilters?.dateTo || '',
+      dateFrom: initialFilters?.dateFrom || today,
+      dateTo: initialFilters?.dateTo || today,
     });
-  }, [initialFilters]);
+  }, [initialFilters, today]);
 
-  // ✅ Trigger for filters (except search)
+  // ✅ Auto-trigger when other filters change
   useEffect(() => {
     onFilterChange({
-      search: filters.search,
-      guestAccount: filters.guestAccount,
-      dateFrom: filters.dateFrom,
-      dateTo: filters.dateTo,
+      ...filters,
       trigger: 'auto',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.guestAccount, filters.dateFrom, filters.dateTo]);
 
-  // ✅ Handle all field updates
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Search only triggers manually
   const handleSearchClick = () => {
     onFilterChange({ ...filters, trigger: 'manual' });
   };
 
-  // ✅ Reset all filters
   const handleReset = () => {
     const reset = {
       search: '',
       guestAccount: 'both',
-      dateFrom: '',
-      dateTo: '',
+      dateFrom: today,
+      dateTo: today,
     };
     setFilters(reset);
     onFilterChange({ ...reset, trigger: 'reset' });
@@ -72,13 +64,20 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
   return (
     <Box sx={styles.root}>
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
+        direction="row"
         spacing={2}
-        alignItems="center"
+        rowGap={2}
+        columnGap={2}
         flexWrap="wrap"
+        alignItems="flex-start"
       >
-        {/* 🔍 Search */}
-        <Stack direction="row" spacing={1} alignItems="center">
+        {/* 🔍 Search + Button */}
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1}
+          alignItems="center"
+          sx={{ flex: '1 1 260px', minWidth: 240 }}
+        >
           <TextField
             label="Search"
             name="search"
@@ -99,7 +98,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
           </Button>
         </Stack>
 
-        {/* 👤 Guest Filter */}
+        {/* 👤 Account Type */}
         <FormControl size="small" sx={styles.selectField}>
           <InputLabel>Account Type</InputLabel>
           <Select
@@ -115,27 +114,34 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
         </FormControl>
 
         {/* 📅 Date Range */}
-        <TextField
-          label="From"
-          type="date"
-          name="dateFrom"
-          value={filters.dateFrom}
-          onChange={handleChange}
-          size="small"
-          sx={styles.dateField}
-          InputLabelProps={{ shrink: true }}
-        />
-        <TextField
-          label="To"
-          type="date"
-          name="dateTo"
-          value={filters.dateTo}
-          onChange={handleChange}
-          size="small"
-          sx={styles.dateField}
-          InputLabelProps={{ shrink: true }}
-        />
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1}
+          sx={styles.dateRangeGroup}
+        >
+          <TextField
+            label="From"
+            type="date"
+            name="dateFrom"
+            value={filters.dateFrom}
+            onChange={handleChange}
+            size="small"
+            sx={styles.dateField}
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="To"
+            type="date"
+            name="dateTo"
+            value={filters.dateTo}
+            onChange={handleChange}
+            size="small"
+            sx={styles.dateField}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Stack>
 
+        {/* 🔁 Reset Button */}
         <Button
           variant="outlined"
           color="error"

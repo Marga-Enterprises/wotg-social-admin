@@ -1,8 +1,10 @@
 const styles = {
+  // 🔶 Root Wrapper
   root: {
     p: { xs: 2, sm: 4 },
   },
 
+  // 🔶 Header
   headerWrapper: {
     mb: 3,
   },
@@ -32,14 +34,27 @@ const styles = {
     },
   },
 
+  // 🔶 Table Container (now responsive + scrollable)
   tableContainer: {
     borderRadius: 3,
     overflow: 'hidden',
     boxShadow: '0 6px 24px rgba(0,0,0,0.06)',
     border: '1px solid #f0f0f0',
     backgroundColor: '#fff',
+    transition: 'box-shadow 0.3s ease',
+
+    // ✅ Add responsive scroll for smaller screens
+    '@media (max-width: 900px)': {
+      overflowX: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      borderRadius: '8px',
+      '& table': {
+        minWidth: '800px', // prevent columns from collapsing
+      },
+    },
   },
 
+  // 🔶 Table Header
   tableHeadCell: {
     fontWeight: 700,
     backgroundColor: '#fafafa',
@@ -51,6 +66,7 @@ const styles = {
     py: 1.5,
   },
 
+  // 🔶 Table Body
   tableBodyCell: {
     borderBottom: '1px solid #f0f0f0',
     fontSize: { xs: '12px', sm: '13px', md: '14px' },
@@ -58,8 +74,10 @@ const styles = {
     verticalAlign: 'middle',
     px: 2,
     py: 1.5,
+    whiteSpace: 'nowrap',
   },
 
+  // 🔶 Table Row Hover
   tableRow: {
     transition: 'background 0.2s ease, transform 0.15s ease',
     '&:hover': {
@@ -68,6 +86,7 @@ const styles = {
     },
   },
 
+  // 🔶 Media Preview Cell
   mediaCell: {
     minWidth: 220,
     textAlign: 'center',
@@ -86,6 +105,7 @@ const styles = {
     },
   },
 
+  // 🔶 Caption + Date
   captionText: {
     lineHeight: 1.5,
     color: '#333',
@@ -96,6 +116,7 @@ const styles = {
     fontWeight: 500,
   },
 
+  // 🔶 Buttons
   editButton: {
     textTransform: 'none',
     borderRadius: '6px',
@@ -115,6 +136,7 @@ const styles = {
     py: 0.5,
   },
 
+  // 🔶 Pagination
   pagination: {
     mt: 4,
     display: 'flex',

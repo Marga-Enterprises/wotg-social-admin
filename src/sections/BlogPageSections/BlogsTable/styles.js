@@ -34,7 +34,7 @@ const styles = {
     },
   },
 
-  // 🔶 Table Container
+  // 🔶 Table Container (scrollable on small screens)
   tableContainer: {
     borderRadius: '12px',
     overflow: 'hidden',
@@ -44,6 +44,16 @@ const styles = {
     transition: 'box-shadow 0.3s ease',
     '&:hover': {
       boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+    },
+
+    // 🧭 Responsive scroll for small screens
+    '@media (max-width: 900px)': {
+      overflowX: 'auto',
+      WebkitOverflowScrolling: 'touch',
+      borderRadius: '10px',
+      '& table': {
+        minWidth: '800px',
+      },
     },
   },
 
@@ -75,7 +85,7 @@ const styles = {
     },
   },
 
-  // 🔶 Row Hover (apply inside TableRow if needed)
+  // 🔶 Row Hover
   tableRowHover: {
     '&:hover': {
       backgroundColor: '#fff5f5',

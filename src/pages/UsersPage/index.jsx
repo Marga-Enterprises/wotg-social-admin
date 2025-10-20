@@ -36,8 +36,11 @@ const Page = () => {
     const currentPage = parseInt(queryParams.get('page')) || 1;
     const search = queryParams.get('search') || '';
     const guestAccount = queryParams.get('guestAccount') || 'both';
-    const dateFrom = queryParams.get('dateFrom') || '';
-    const dateTo = queryParams.get('dateTo') || '';
+
+    // 🗓 Default date = today (YYYY-MM-DD)
+    const today = new Date().toISOString().split('T')[0];
+    const dateFrom = queryParams.get('dateFrom') || today;
+    const dateTo = queryParams.get('dateTo') || today;
 
     handleFetchUsers(currentPage, search, guestAccount, dateFrom, dateTo);
   }, [location.search, handleFetchUsers]);

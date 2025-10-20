@@ -1,112 +1,179 @@
 const styles = {
-  root: {
-    p: { xs: 2, sm: 3 },
+  // 🔶 Root Form Wrapper (responsive)
+  formWrapper: {
+    backgroundColor: '#ffffff',
+    borderRadius: '16px',
+    padding: '40px',
+    maxWidth: '1080px',
+    margin: '40px auto',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      boxShadow: '0 10px 28px rgba(0,0,0,0.12)',
+    },
+
+    // 📱 Responsive adjustments
+    '@media (max-width: 900px)': {
+      padding: '24px',
+      margin: '24px auto',
+      overflowX: 'auto', // ✅ allows horizontal scroll when editors overflow
+      WebkitOverflowScrolling: 'touch',
+    },
+    '@media (max-width: 600px)': {
+      padding: '20px',
+    },
   },
 
+  // 🔶 Header
   headerTitle: {
     fontWeight: 700,
-    color: '#1a1a1a',
+    color: '#222',
+    fontSize: '1.8rem',
     letterSpacing: '-0.3px',
+    '@media (max-width: 600px)': {
+      fontSize: '1.5rem',
+    },
   },
-
-  addButton: {
-    fontWeight: 700,
-    textTransform: 'none',
-    borderRadius: 2,
-    px: 2.5,
-    py: 1,
-    fontSize: '0.9rem',
-    background: 'linear-gradient(135deg, #b71c1c, #d32f2f)',
-    boxShadow: '0 4px 12px rgba(211,47,47,0.3)',
-    '&:hover': {
-      background: 'linear-gradient(135deg, #9c1c1c, #c62828)',
-      boxShadow: '0 6px 16px rgba(211,47,47,0.35)',
+  headerSubtitle: {
+    color: '#666',
+    fontSize: '0.95rem',
+    marginTop: '4px',
+    '@media (max-width: 600px)': {
+      fontSize: '0.9rem',
     },
   },
 
-  tableContainer: {
-    borderRadius: 3,
-    overflow: 'hidden',
-    boxShadow: '0 6px 20px rgba(0,0,0,0.06)',
-    border: '1px solid #e0e0e0',
+  // 🔶 Labels and Fields
+  label: {
+    fontWeight: 600,
+    fontSize: '1rem',
+    marginBottom: '8px',
+    color: '#333',
   },
-
-  tableHeadCell: {
-    fontWeight: 700,
-    color: '#444',
+  textField: {
     backgroundColor: '#fafafa',
-    borderBottom: '2px solid #e0e0e0',
-    fontSize: '13px',
-    textTransform: 'uppercase',
-    whiteSpace: 'nowrap',
-  },
-
-  tableBodyCell: {
-    fontSize: '13px',
-    borderBottom: '1px solid #eee',
-    whiteSpace: 'nowrap',
-  },
-
-  tableRow: {
-    transition: 'background 0.2s ease',
-    '&:hover': {
-      backgroundColor: '#fff7f7',
-    },
-  },
-
-  thumbnail: {
-    width: 56,
-    height: 56,
     borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-  },
-
-  titleText: {
-    fontWeight: 600,
-    color: '#212121',
-  },
-
-  genreChip: {
-    backgroundColor: '#ffe5e5',
-    color: '#b71c1c',
-    fontWeight: 600,
-    borderRadius: '8px',
-    px: 0.5,
-  },
-
-  playCount: {
-    fontWeight: 600,
-    color: '#555',
-  },
-
-  editButton: {
-    textTransform: 'none',
-    fontWeight: 600,
-    fontSize: '0.8rem',
-    background: 'linear-gradient(135deg, #1976d2, #42a5f5)',
-    '&:hover': {
-      background: 'linear-gradient(135deg, #1565c0, #1e88e5)',
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#ddd',
+      },
+      '&:hover fieldset': {
+        borderColor: '#999',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#3f51b5',
+      },
     },
   },
 
-  deleteButton: {
-    textTransform: 'none',
-    fontWeight: 600,
-    fontSize: '0.8rem',
-    borderWidth: '1.5px',
-    '&:hover': {
-      borderWidth: '1.5px',
+  // 🔶 TinyMCE Editors (scrollable on smaller screens)
+  editorIntro: {
+    height: 300,
+    menubar: false,
+    skin: 'oxide',
+    content_css: 'default',
+    plugins: ['lists', 'link', 'wordcount'],
+    toolbar:
+      'undo redo | formatselect | bold italic underline | bullist numlist | link | removeformat',
+    content_style:
+      'body { font-family: Inter, sans-serif; font-size: 15px; color:#333; line-height: 1.6; background:#fff; padding:10px; }',
+
+    '@media (max-width: 900px)': {
+      width: '100%',
+      minWidth: '700px', // ✅ prevents text from squishing
+    },
+  },
+  editorBody: {
+    height: 450,
+    menubar: true,
+    skin: 'oxide',
+    content_css: 'default',
+    plugins: [
+      'advlist autolink lists link image charmap print preview anchor',
+      'searchreplace visualblocks code fullscreen',
+      'insertdatetime media table paste code help wordcount',
+    ],
+    toolbar:
+      'undo redo | styleselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | removeformat',
+    content_style:
+      'body { font-family: Inter, sans-serif; font-size: 15px; color:#333; line-height: 1.6; background:#fff; padding:12px; }',
+
+    '@media (max-width: 900px)': {
+      width: '100%',
+      minWidth: '800px',
     },
   },
 
-  noDataCell: {
-    py: 5,
-  },
-
-  pagination: {
-    mt: 3,
+  // 🔶 Upload Section
+  uploadBox: {
     display: 'flex',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    gap: '16px',
+    marginTop: '8px',
+    '@media (max-width: 600px)': {
+      gap: '12px',
+    },
+  },
+  uploadBtn: {
+    borderRadius: '8px',
+    textTransform: 'none',
+    fontWeight: 600,
+    borderColor: '#ccc',
+    '&:hover': {
+      borderColor: '#888',
+      backgroundColor: '#f9f9f9',
+    },
+  },
+  thumbnail: {
+    width: '100%',
+    maxWidth: '360px',
+    height: 'auto',
+    borderRadius: '10px',
+    objectFit: 'cover',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+    transition: 'transform 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.02)',
+    },
+    '@media (max-width: 600px)': {
+      maxWidth: '100%',
+    },
+  },
+
+  // 🔶 Submit Button
+  submitBtn: {
+    padding: '12px 32px',
+    borderRadius: '10px',
+    fontWeight: 700,
+    fontSize: '16px',
+    textTransform: 'none',
+    letterSpacing: '0.5px',
+    color: '#fff',
+    background: 'linear-gradient(135deg, #d32f2f, #ef5350)',
+    boxShadow: '0 4px 12px rgba(239, 83, 80, 0.3)',
+    transition: 'all 0.3s ease',
+
+    '&:hover': {
+      background: 'linear-gradient(135deg, #b71c1c, #e53935)',
+      boxShadow: '0 6px 18px rgba(244, 67, 54, 0.45)',
+      transform: 'translateY(-1px)',
+    },
+    '&:active': {
+      transform: 'translateY(1px)',
+      boxShadow: '0 2px 8px rgba(244, 67, 54, 0.35)',
+    },
+    '&:disabled': {
+      opacity: 0.6,
+      cursor: 'not-allowed',
+      background: 'linear-gradient(135deg, #c62828, #ef9a9a)',
+      boxShadow: 'none',
+    },
+
+    '@media (max-width: 600px)': {
+      width: '100%',
+      fontSize: '15px',
+      padding: '12px 0',
+    },
   },
 };
 
