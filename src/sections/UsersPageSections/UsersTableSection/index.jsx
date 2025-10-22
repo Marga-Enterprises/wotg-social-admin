@@ -25,6 +25,20 @@ import LoadingScreen from '@components/common/LoadingScreen';
 const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) => {
   if (loading) return <LoadingScreen />;
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'abandoned':
+        return { label: 'Abandoned', color: '#d32f2f' }; // Red
+      case 'no_contact':
+        return { label: 'No Contact', color: '#ed6c02' }; // Orange
+      case 'in_contact':
+        return { label: 'In Contact', color: '#0288d1' }; // Blue
+      case 'active':
+      default:
+        return { label: 'Active', color: '#2e7d32' }; // Green
+    }
+  };
+
   return (
     <Box sx={styles.root}>
       {/* 📋 Users Table */}
@@ -43,9 +57,7 @@ const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) =
           <TableBody>
             {users.length > 0 ? (
               users.map((user, index) => {
-                const status = user.guest_status === 'abandoned' ? 'Abandoned' : 'Active';
-                const statusColor =
-                  user.guest_status === 'abandoned' ? '#d32f2f' : '#2e7d32';
+                const { label, color } = getStatusStyle(user.guest_status);
 
                 return (
                   <TableRow key={user.id} hover sx={styles.tableRow}>
@@ -82,9 +94,9 @@ const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) =
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Typography
                           variant="body2"
-                          sx={{ color: statusColor, fontWeight: 600 }}
+                          sx={{ color, fontWeight: 600 }}
                         >
-                          {status}
+                          {label}
                         </Typography>
                       </Stack>
                     </TableCell>
