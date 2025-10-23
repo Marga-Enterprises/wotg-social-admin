@@ -14,6 +14,7 @@ import {
   Pagination,
   Stack,
   Typography,
+  Button,
 } from '@mui/material';
 
 // styles
@@ -22,7 +23,14 @@ import styles from './styles';
 // components
 import LoadingScreen from '@components/common/LoadingScreen';
 
-const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) => {
+const UsersTableSection = ({
+  users,
+  loading,
+  page,
+  totalPages,
+  onPageChange,
+  createChatroom, // ✅ passed from parent (Page.jsx)
+}) => {
   if (loading) return <LoadingScreen />;
 
   const getStatusStyle = (status) => {
@@ -51,6 +59,9 @@ const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) =
               <TableCell sx={styles.tableHeadCell}>Last Name</TableCell>
               <TableCell sx={styles.tableHeadCell}>Email</TableCell>
               <TableCell sx={styles.tableHeadCell}>Status</TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -100,12 +111,23 @@ const UsersTableSection = ({ users, loading, page, totalPages, onPageChange }) =
                         </Typography>
                       </Stack>
                     </TableCell>
+
+                    {/* ✅ Action Button */}
+                    <TableCell sx={styles.tableBodyCell} align="center">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => createChatroom(user.id)}
+                      >
+                        Create Chatroom
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={styles.noDataCell}>
+                <TableCell colSpan={6} align="center" sx={styles.noDataCell}>
                   <Typography variant="body2" color="text.secondary">
                     No users found.
                   </Typography>

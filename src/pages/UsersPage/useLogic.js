@@ -5,9 +5,21 @@ import { useState, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { marga } from '@redux/combineActions';
 
+// cookies
+import Cookies from 'js-cookie';
+
 export const useLogic = (navigate, location) => {
   const dispatch = useDispatch();
   const loadingRef = useRef(false);
+
+  // ✅ Get logged-in user directly from cookies
+  let currentUser = null;
+  try {
+    const cookieData = Cookies.get('account');
+    if (cookieData) currentUser = JSON.parse(cookieData);
+  } catch (err) {
+    console.error('❌ Failed to parse user cookie:', err);
+  }
 
   // 🧠 States
   const [loading, setLoading] = useState(false);
@@ -62,7 +74,7 @@ export const useLogic = (navigate, location) => {
     [dispatch]
   );
 
-  // 🧠 Handle Filter Changes (moved from Page.jsx)
+  // 🧠 Handle Filter Changes
   const handleFilterChange = useCallback(
     (newFilters) => {
       const params = new URLSearchParams(location.search);
@@ -80,7 +92,6 @@ export const useLogic = (navigate, location) => {
       if (newFilters.dateTo) params.set('dateTo', newFilters.dateTo);
       else params.delete('dateTo');
 
-      // Navigate only when triggered properly
       if (
         newFilters.trigger === 'manual' ||
         newFilters.trigger === 'auto' ||
@@ -92,11 +103,45 @@ export const useLogic = (navigate, location) => {
     [navigate, location.search]
   );
 
+  // 💬 Handle Create Private Chatroom
+  const handleCreateChatroom = useCallback(
+    async (targetUserId) => {
+      if (!currentUser?.id) {
+        alert('Please login first.');
+        return;
+      }
+
+      try {
+        const payload = {
+          participants: [currentUser.id, targetUserId],
+          target_user_id: targetUserId,
+        };
+
+        const res = await dispatch(marga.chatroom.createChatroomAction(payload));
+
+        if (res?.success && res?.data?.id) {
+          const chatId = res.data.id;
+          const baseUrl =
+            process.env.NODE_ENV === 'development'
+              ? 'http://localhost:3000/chat'
+              : 'https://community.wotgonline.com/chat';
+
+          // ✅ Redirect to chatroom
+          window.open(`${baseUrl}?chat=${chatId}`, '_blank', 'noopener,noreferrer');
+        }
+      } catch (err) {
+        console.error('❌ Create chatroom error:', err);
+      }
+    },
+    [dispatch, currentUser]
+  );
+
   return {
     loading,
     users,
     pageDetails,
     handleFetchUsers,
     handleFilterChange,
+    handleCreateChatroom,
   };
 };

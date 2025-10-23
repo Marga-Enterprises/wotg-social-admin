@@ -28,6 +28,7 @@ const Page = () => {
     pageDetails,
     handleFetchUsers,
     handleFilterChange,
+    handleCreateChatroom,
   } = useLogic(navigate, location);
 
   // 🔄 Fetch users when query params change
@@ -75,6 +76,7 @@ const Page = () => {
         users={users}
         page={pageDetails.pageIndex}
         totalPages={pageDetails.totalPages}
+        createChatroom={handleCreateChatroom}
         onPageChange={(newPage) => {
           const params = new URLSearchParams(location.search);
           params.set('page', newPage);

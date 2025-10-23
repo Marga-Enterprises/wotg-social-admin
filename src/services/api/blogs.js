@@ -2,7 +2,7 @@
 import * as methods from '@utils/methods';
 
 // requests
-import { GET, POST, PUT, DELETE } from '@services/request';
+import { GET, POST, PUT, DELETE } from '@services/requestAdminWeb';
 
 export async function fetchBlogsService(payload) {
   const params = methods.convertQueryString(payload);

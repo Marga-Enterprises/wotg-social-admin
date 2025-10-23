@@ -1,5 +1,5 @@
 // requests
-import { POST } from '@services/request';
+import { POST } from '@services/requestAdminWeb';
 
 export async function getPresignedUrlService(payload) {
   return POST('/media/presigned-url', payload);
