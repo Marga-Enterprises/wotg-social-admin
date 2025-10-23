@@ -103,7 +103,7 @@ export const useLogic = (navigate, location) => {
     [navigate, location.search]
   );
 
-  // 💬 Handle Create Private Chatroom
+  // Handle Create Private Chatroom
   const handleCreateChatroom = useCallback(
     async (targetUserId) => {
       if (!currentUser?.id) {
@@ -126,11 +126,28 @@ export const useLogic = (navigate, location) => {
               ? 'http://localhost:3000/chat'
               : 'https://community.wotgonline.com/chat';
 
-          // ✅ Redirect to chatroom
-          window.open(`${baseUrl}?chat=${chatId}`, '_blank', 'noopener,noreferrer');
+          const chatUrl = `${baseUrl}?chat=${chatId}`;
+          const tabName = `chat_${chatId}`;
 
-          // then reload the page after a short delay
-          window.location.reload();
+          // ✅ Always try to open new tab (unique per chat)
+          const newTab = window.open(chatUrl, tabName, 'noopener,noreferrer');
+
+          // ✅ Popup blocked fallback: open manually without changing admin page
+          if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+            // create a temporary link and trigger click (no redirect in admin)
+            const tempLink = document.createElement('a');
+            tempLink.href = chatUrl;
+            tempLink.target = '_blank';
+            tempLink.rel = 'noopener noreferrer';
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+          }
+
+          // ✅ Just refresh admin page — no URL change
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
         }
       } catch (err) {
         console.error('❌ Create chatroom error:', err);
@@ -138,6 +155,7 @@ export const useLogic = (navigate, location) => {
     },
     [dispatch, currentUser]
   );
+
 
   return {
     loading,
