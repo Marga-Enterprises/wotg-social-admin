@@ -128,6 +128,9 @@ export const useLogic = (navigate, location) => {
 
           // ✅ Redirect to chatroom
           window.open(`${baseUrl}?chat=${chatId}`, '_blank', 'noopener,noreferrer');
+
+          // then reload the page after a short delay
+          window.location.reload();
         }
       } catch (err) {
         console.error('❌ Create chatroom error:', err);
