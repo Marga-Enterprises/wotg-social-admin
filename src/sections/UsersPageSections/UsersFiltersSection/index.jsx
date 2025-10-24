@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Stack,
+  Grid,
   TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   Button,
+  Stack,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import styles from './styles';
 
 const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
-  // 🗓️ Default date = today's date (YYYY-MM-DD)
   const today = new Date().toISOString().split('T')[0];
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [filters, setFilters] = useState({
     search: initialFilters?.search || '',
@@ -22,7 +26,6 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
     dateTo: initialFilters?.dateTo || today,
   });
 
-  // ✅ Sync state when URL filters change
   useEffect(() => {
     setFilters({
       search: initialFilters?.search || '',
@@ -32,12 +35,8 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
     });
   }, [initialFilters, today]);
 
-  // ✅ Auto-trigger when other filters change
   useEffect(() => {
-    onFilterChange({
-      ...filters,
-      trigger: 'auto',
-    });
+    onFilterChange({ ...filters, trigger: 'auto' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.guestAccount, filters.dateFrom, filters.dateTo]);
 
@@ -48,6 +47,10 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
 
   const handleSearchClick = () => {
     onFilterChange({ ...filters, trigger: 'manual' });
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') handleSearchClick();
   };
 
   const handleReset = () => {
@@ -62,95 +65,132 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
   };
 
   return (
-    <Box sx={styles.root}>
-      <Stack
-        direction="row"
-        spacing={2}
-        rowGap={2}
-        columnGap={2}
-        flexWrap="wrap"
-        alignItems="flex-start"
-      >
-        {/* 🔍 Search + Button */}
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1}
-          alignItems="center"
-          sx={{ flex: '1 1 260px', minWidth: 240 }}
-        >
+    <Box sx={styles.container}>
+      {isMobile ? (
+        // 📱 STACKED (MOBILE)
+        <Stack spacing={1} sx={{ width: '100%' }}>
           <TextField
+            fullWidth
             label="Search"
             name="search"
             value={filters.search}
             onChange={handleChange}
-            placeholder="Search by name or email"
-            variant="outlined"
+            onKeyDown={handleKeyPress}
             size="small"
-            sx={styles.searchField}
+            sx={styles.textField}
           />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSearchClick}
-            sx={styles.searchButton}
-          >
-            Search
-          </Button>
-        </Stack>
-
-        {/* 👤 Account Type */}
-        <FormControl size="small" sx={styles.selectField}>
-          <InputLabel>Account Type</InputLabel>
-          <Select
-            label="Account Type"
-            name="guestAccount"
-            value={filters.guestAccount}
-            onChange={handleChange}
-          >
-            <MenuItem value="both">Both</MenuItem>
-            <MenuItem value="guest">Guest Accounts Only</MenuItem>
-            <MenuItem value="nonguest">Non-Guest Accounts</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* 📅 Date Range */}
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1}
-          sx={styles.dateRangeGroup}
-        >
+          <FormControl fullWidth size="small" sx={styles.textField}>
+            <InputLabel>Account Type</InputLabel>
+            <Select
+              label="Account Type"
+              name="guestAccount"
+              value={filters.guestAccount}
+              onChange={handleChange}
+            >
+              <MenuItem value="both">Both</MenuItem>
+              <MenuItem value="guest">Guest Only</MenuItem>
+              <MenuItem value="nonguest">Non-Guest</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
+            fullWidth
             label="From"
             type="date"
             name="dateFrom"
             value={filters.dateFrom}
             onChange={handleChange}
             size="small"
-            sx={styles.dateField}
             InputLabelProps={{ shrink: true }}
+            sx={styles.textField}
           />
           <TextField
+            fullWidth
             label="To"
             type="date"
             name="dateTo"
             value={filters.dateTo}
             onChange={handleChange}
             size="small"
-            sx={styles.dateField}
             InputLabelProps={{ shrink: true }}
+            sx={styles.textField}
           />
+          <Stack direction="row" spacing={1}>
+            <Button fullWidth variant="contained" onClick={handleSearchClick} sx={styles.searchButton}>
+              Search
+            </Button>
+            <Button fullWidth variant="outlined" color="error" onClick={handleReset} sx={styles.resetButton}>
+              Reset
+            </Button>
+          </Stack>
         </Stack>
-
-        {/* 🔁 Reset Button */}
-        <Button
-          variant="outlined"
-          color="error"
-          onClick={handleReset}
-          sx={styles.resetButton}
-        >
-          Reset
-        </Button>
-      </Stack>
+      ) : (
+        // 💻 INLINE (DESKTOP)
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm={4} md={3}>
+            <TextField
+              fullWidth
+              label="Search"
+              name="search"
+              value={filters.search}
+              onChange={handleChange}
+              onKeyDown={handleKeyPress}
+              size="small"
+              sx={styles.textField}
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} md={2}>
+            <FormControl fullWidth size="small" sx={styles.textField}>
+              <InputLabel>Account Type</InputLabel>
+              <Select
+                label="Account Type"
+                name="guestAccount"
+                value={filters.guestAccount}
+                onChange={handleChange}
+              >
+                <MenuItem value="both">Both</MenuItem>
+                <MenuItem value="guest">Guest Only</MenuItem>
+                <MenuItem value="nonguest">Non-Guest</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={2} md={2}>
+            <TextField
+              fullWidth
+              label="From"
+              type="date"
+              name="dateFrom"
+              value={filters.dateFrom}
+              onChange={handleChange}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              sx={styles.textField}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2} md={2}>
+            <TextField
+              fullWidth
+              label="To"
+              type="date"
+              name="dateTo"
+              value={filters.dateTo}
+              onChange={handleChange}
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              sx={styles.textField}
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} md={3}>
+            <Stack direction="row" spacing={1} justifyContent="flex-end">
+              <Button variant="contained" onClick={handleSearchClick} sx={styles.searchButton}>
+                Search
+              </Button>
+              <Button variant="outlined" color="error" onClick={handleReset} sx={styles.resetButton}>
+                Reset
+              </Button>
+            </Stack>
+          </Grid>
+        </Grid>
+      )}
     </Box>
   );
 };

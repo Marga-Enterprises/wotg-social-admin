@@ -45,7 +45,7 @@ export const useLogic = () => {
 
 
     // Function to fetch musics based on the page index
-    const handleFetchMusics = useCallback(async (pageIndex, search) => {
+    const handleFetchMusics = useCallback(async (pageIndex, search, albumId) => {
         if (loadingRef.current) return;
         loadingRef.current = true;
         setLoading(true);
@@ -56,6 +56,7 @@ export const useLogic = () => {
                     pageIndex,
                     pageSize: 10,
                     search: search || '',
+                    albumId: albumId || '',
                 })
             );
 

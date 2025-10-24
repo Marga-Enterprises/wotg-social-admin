@@ -15,17 +15,16 @@ import { useLogic } from './useLogic';
 
 // sections
 import MusicsTableSection from '@sections/MusicsPageSections/MusicsTableSection';
+import MusicsFiltersSection from '@sections/MusicsPageSections/MusicsFiltersSection';
 
 // components
 import AddMusicFormModal from '@components/musics/AddMusicFormModal';
 import EditMusicFormModal from '@components/musics/EditMusicFormModal';
 
 const Page = () => {
-  // hooks
   const location = useLocation();
   const navigate = useNavigate();
 
-  // logic hooks
   const {
     musics,
     albums,
@@ -47,15 +46,49 @@ const Page = () => {
     handleUpdateMusic,
   } = useLogic();
 
-  // load music and albums
+  // Load musics and albums on mount or when query changes
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const currentPage = parseInt(queryParams.get('page')) || 1;
     const search = queryParams.get('search') || '';
+    const albumId = queryParams.get('albumId') || '';
 
-    handleFetchMusics(currentPage, search);
+    handleFetchMusics(currentPage, search, albumId);
     handleFetchAlbums(1, '');
   }, [location.search, handleFetchMusics, handleFetchAlbums]);
+
+  // ✅ Handle filter changes
+  const handleFilterChange = (filters) => {
+    const params = new URLSearchParams(location.search);
+
+    if (filters.trigger === 'reset') {
+      params.delete('search');
+      params.delete('albumId');
+      params.set('page', 1);
+    } else {
+      if (filters.search !== undefined) {
+        if (filters.search) params.set('search', filters.search);
+        else params.delete('search');
+      }
+
+      if (filters.albumId !== undefined) {
+        if (filters.albumId) params.set('albumId', filters.albumId);
+        else params.delete('albumId');
+      }
+
+      // Reset to first page when filters change
+      if (filters.trigger !== 'manual') params.set('page', 1);
+    }
+
+    navigate(`?${params.toString()}`);
+  };
+
+  // ✅ Get current filters from URL
+  const queryParams = new URLSearchParams(location.search);
+  const currentFilters = {
+    search: queryParams.get('search') || '',
+    albumId: queryParams.get('albumId') || '',
+  };
 
   return (
     <Box sx={styles.container}>
@@ -68,6 +101,13 @@ const Page = () => {
           Manage, edit, and organize all uploaded songs and albums in your library.
         </Typography>
       </Stack>
+
+      {/* 🎛 Filters Section */}
+      <MusicsFiltersSection
+        albums={albums}
+        initialFilters={currentFilters}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* 🎶 Add Music Modal */}
       <AddMusicFormModal
