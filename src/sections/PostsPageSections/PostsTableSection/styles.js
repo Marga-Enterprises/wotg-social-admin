@@ -2,6 +2,8 @@ const styles = {
   // 🔶 Root Wrapper
   root: {
     p: { xs: 2, sm: 4 },
+    borderRadius: 3,
+    background: 'linear-gradient(180deg, #ffffff, #fff6f6)',
   },
 
   // 🔶 Header
@@ -10,8 +12,8 @@ const styles = {
   },
 
   headerTitle: {
-    fontWeight: 700,
-    color: '#b71c1c',
+    fontWeight: 800,
+    color: '#cc0000',
     letterSpacing: '-0.3px',
   },
 
@@ -23,33 +25,30 @@ const styles = {
   addButton: {
     textTransform: 'none',
     fontWeight: 700,
-    borderRadius: '8px',
-    px: 2.5,
+    borderRadius: '999px',
+    px: 3,
     py: 1.2,
-    background: 'linear-gradient(135deg, #b71c1c, #d32f2f)',
-    boxShadow: '0 4px 14px rgba(211,47,47,0.3)',
+    background: 'linear-gradient(135deg, #cc0000, #ff4d4d)',
+    color: '#fff',
+    boxShadow: '0 4px 12px rgba(204,0,0,0.35)',
     '&:hover': {
-      background: 'linear-gradient(135deg, #9c1c1c, #c62828)',
-      boxShadow: '0 6px 20px rgba(211,47,47,0.35)',
+      background: 'linear-gradient(135deg, #b71c1c, #ff3333)',
+      boxShadow: '0 6px 18px rgba(204,0,0,0.4)',
     },
   },
 
-  // 🔶 Table Container (now responsive + scrollable)
+  // 🔶 Table Container
   tableContainer: {
     borderRadius: 3,
     overflow: 'hidden',
-    boxShadow: '0 6px 24px rgba(0,0,0,0.06)',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
     border: '1px solid #f0f0f0',
     backgroundColor: '#fff',
-    transition: 'box-shadow 0.3s ease',
-
-    // ✅ Add responsive scroll for smaller screens
     '@media (max-width: 900px)': {
       overflowX: 'auto',
       WebkitOverflowScrolling: 'touch',
-      borderRadius: '8px',
       '& table': {
-        minWidth: '800px', // prevent columns from collapsing
+        minWidth: '850px',
       },
     },
   },
@@ -57,51 +56,73 @@ const styles = {
   // 🔶 Table Header
   tableHeadCell: {
     fontWeight: 700,
-    backgroundColor: '#fafafa',
-    borderBottom: '2px solid #e0e0e0',
+    backgroundColor: '#ffeaea',
+    borderBottom: '2px solid #f5b5b5',
     fontSize: { xs: '12px', sm: '13px', md: '14px' },
-    color: '#444',
+    color: '#a00000',
+    textTransform: 'uppercase',
     whiteSpace: 'nowrap',
-    px: 2,
     py: 1.5,
   },
 
   // 🔶 Table Body
   tableBodyCell: {
-    borderBottom: '1px solid #f0f0f0',
+    borderBottom: '1px solid #f2f2f2',
     fontSize: { xs: '12px', sm: '13px', md: '14px' },
-    color: '#333',
+    color: '#222',
     verticalAlign: 'middle',
-    px: 2,
     py: 1.5,
-    whiteSpace: 'nowrap',
   },
 
   // 🔶 Table Row Hover
   tableRow: {
-    transition: 'background 0.2s ease, transform 0.15s ease',
+    '&:nth-of-type(odd)': { backgroundColor: '#fffafa' },
+    transition: 'background 0.25s ease, box-shadow 0.2s ease',
     '&:hover': {
-      backgroundColor: '#fff6f6',
-      transform: 'scale(1.002)',
+      backgroundColor: '#fff3f3',
+      boxShadow: 'inset 0 0 0 1px #ffd6d6',
     },
   },
 
-  // 🔶 Media Preview Cell
+  // 🔶 Media Preview
   mediaCell: {
     minWidth: 220,
     textAlign: 'center',
   },
 
-  mediaPreview: {
-    width: { xs: '100%', sm: 240, md: 300 },
-    height: { xs: 160, sm: 180, md: 200 },
+  mediaWrapper: {
+    position: 'relative',
+    display: 'inline-block',
     borderRadius: '12px',
+    overflow: 'hidden',
+    '&:hover video': { filter: 'brightness(0.75)' },
+    '&:hover img': { filter: 'brightness(0.85)' },
+  },
+
+  mediaPreview: {
+    width: { xs: '100%', sm: 220, md: 260 },
+    height: { xs: 140, sm: 160, md: 180 },
+    borderRadius: '10px',
     objectFit: 'cover',
-    boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-    transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
     '&:hover': {
-      transform: 'scale(1.03)',
-      boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
+      transform: 'scale(1.04)',
+      boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
+    },
+  },
+
+  playIcon: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    fontSize: 48,
+    color: '#fff',
+    opacity: 0,
+    transition: 'opacity 0.3s ease',
+    pointerEvents: 'none',
+    [`${'.MuiBox-root:hover &'}`]: {
+      opacity: 1,
     },
   },
 
@@ -116,24 +137,77 @@ const styles = {
     fontWeight: 500,
   },
 
+  // 🔶 Status Chip
+  statusChip: {
+    display: 'inline-block',
+    px: 1.4,
+    py: 0.3,
+    borderRadius: '999px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    color: '#fff',
+    backgroundColor: '#cc0000',
+    boxShadow: '0 2px 6px rgba(204,0,0,0.3)',
+  },
+
+  // 🔶 Actions Cell
+  actionsCell: {
+    textAlign: 'center',
+    minWidth: 180,
+    '@media (max-width: 600px)': {
+      minWidth: 240,
+    },
+  },
+
+  // 🔶 Actions Wrapper (fix alignment)
+  actionsWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '8px',
+    flexWrap: 'wrap',
+    '@media (max-width: 600px)': {
+      flexDirection: 'column',
+      gap: '6px',
+      '& button': {
+        width: '100%',
+        maxWidth: 180,
+      },
+    },
+  },
+
   // 🔶 Buttons
   editButton: {
     textTransform: 'none',
-    borderRadius: '6px',
-    px: 1.8,
-    py: 0.5,
-    background: 'linear-gradient(135deg, #b71c1c, #d32f2f)',
+    fontWeight: 600,
+    borderRadius: '999px',
+    px: 2,
+    py: 0.6,
+    background: 'linear-gradient(135deg, #cc0000, #ff4d4d)',
     color: '#fff',
+    boxShadow: '0 2px 6px rgba(204,0,0,0.25)',
+    minWidth: 80,
     '&:hover': {
-      background: 'linear-gradient(135deg, #9c1c1c, #c62828)',
+      background: 'linear-gradient(135deg, #b71c1c, #ff3333)',
+      boxShadow: '0 3px 8px rgba(204,0,0,0.35)',
     },
   },
 
   deleteButton: {
     textTransform: 'none',
-    borderRadius: '6px',
-    px: 1.8,
-    py: 0.5,
+    fontWeight: 600,
+    borderRadius: '999px',
+    px: 2,
+    py: 0.6,
+    minWidth: 80,
+    color: '#cc0000',
+    borderColor: '#cc0000',
+    '&:hover': {
+      backgroundColor: '#fff5f5',
+      borderColor: '#a00000',
+      color: '#a00000',
+    },
   },
 
   // 🔶 Pagination
@@ -142,11 +216,16 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     '& .MuiPaginationItem-root': {
-      fontWeight: 600,
-      color: '#b71c1c',
+      borderRadius: '8px',
+      color: '#cc0000',
+      fontWeight: 500,
       '&.Mui-selected': {
-        backgroundColor: '#b71c1c',
+        backgroundColor: '#cc0000',
         color: '#fff',
+        boxShadow: '0 3px 10px rgba(204,0,0,0.3)',
+        '&:hover': {
+          backgroundColor: '#b71c1c',
+        },
       },
     },
   },

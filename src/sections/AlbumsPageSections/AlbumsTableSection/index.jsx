@@ -1,9 +1,7 @@
-// react
 import React from 'react';
-
-// mui
 import {
   Box,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -12,129 +10,183 @@ import {
   TableRow,
   Paper,
   Pagination,
-  Stack,
   Typography,
   Button,
   Avatar,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-
-// react-router
-import { Link as RouterLink } from 'react-router-dom';
-
-// components
+import styles from './styles';
 import LoadingScreen from '@components/common/LoadingScreen';
 
-// styles
-import styles from './styles';
-
 const AlbumsTableSection = ({
-  albums = [],
-  loading = false,
-  page = 1,
-  totalPages = 1,
+  albums,
+  loading,
+  page,
+  totalPages,
   openAddAlbumModal,
-  onDeleteAlbum,
   onOpenEditAlbumModal,
+  onDeleteAlbum,
   onPageChange,
 }) => {
-  // 🔹 Show loader if fetching
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (loading) return <LoadingScreen />;
-
-  // 🔹 Render table rows
-  const renderTableRows = () => {
-    if (albums.length === 0) {
-      return (
-        <TableRow>
-          <TableCell colSpan={3} align="center" sx={styles.tableBodyCell}>
-            No albums found.
-          </TableCell>
-        </TableRow>
-      );
-    }
-
-    return albums.map(({ id, title, cover_image }) => (
-      <TableRow key={id} hover sx={styles.tableRowHover}>
-        {/* Thumbnail */}
-        <TableCell sx={styles.tableBodyCell}>
-          <Avatar
-            variant="rounded"
-            alt={title}
-            src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${cover_image}`}
-            sx={{ width: 56, height: 56 }}
-          />
-        </TableCell>
-
-        {/* Title */}
-        <TableCell sx={styles.tableBodyCell}>
-          <Typography variant="subtitle2" noWrap>
-            {title}
-          </Typography>
-        </TableCell>
-
-        {/* Actions */}
-        <TableCell sx={styles.tableBodyCell}>
-          <Stack direction="row" spacing={1}>
-            <Button
-              variant="contained"
-              size="small"
-              sx={styles.actionButtonEdit}
-              onClick={() => onOpenEditAlbumModal(id)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              sx={styles.actionButtonDelete}
-              onClick={() => onDeleteAlbum(id)}
-            >
-              Delete
-            </Button>
-          </Stack>
-        </TableCell>
-      </TableRow>
-    ));
-  };
 
   return (
     <Box sx={styles.root}>
-      {/* 🔹 Header */}
+      {/* 🎵 Header */}
       <Stack
-        direction="row"
+        direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems="center"
-        sx={styles.header}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        mb={2}
+        spacing={1.5}
       >
         <Button
           variant="contained"
-          onClick={openAddAlbumModal}
           sx={styles.addButton}
+          onClick={openAddAlbumModal}
+          fullWidth={isMobile}
         >
-          + Create New Album
+          + Add New Album
         </Button>
       </Stack>
 
-      {/* 🔹 Table */}
-      <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table size="small">
+      {/* 💿 Albums Table */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          ...styles.tableContainer,
+          overflowX: isMobile ? 'auto' : 'visible',
+        }}
+      >
+        <Table stickyHeader size="small" sx={styles.table}>
           <TableHead>
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>Thumbnail</TableCell>
               <TableCell sx={styles.tableHeadCell}>Title</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
+              {!isMobile && <TableCell sx={styles.tableHeadCell}>Artist</TableCell>}
+              {!isMobile && <TableCell sx={styles.tableHeadCell}>Songs</TableCell>}
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
 
-          <TableBody>{renderTableRows()}</TableBody>
+          <TableBody>
+            {albums.length > 0 ? (
+              albums.map((album) => (
+                <TableRow key={album.id} hover sx={styles.tableRow}>
+                  {/* Thumbnail */}
+                  <TableCell sx={styles.tableBodyCell}>
+                    <Avatar
+                      variant="rounded"
+                      alt={album.title}
+                      src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${album.cover_image}`}
+                      sx={styles.thumbnail}
+                    />
+                  </TableCell>
+
+                  {/* Title */}
+                  <TableCell sx={styles.tableBodyCell}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        ...styles.titleText,
+                        fontSize: isMobile ? '0.85rem' : '0.95rem',
+                      }}
+                    >
+                      {album.title}
+                    </Typography>
+                  </TableCell>
+
+                  {/* Artist */}
+                  {!isMobile && (
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontSize: isMobile ? '0.8rem' : '0.9rem' }}
+                      >
+                        {album.artist_name || '—'}
+                      </Typography>
+                    </TableCell>
+                  )}
+
+                  {/* Song Count */}
+                  {!isMobile && (
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ fontSize: isMobile ? '0.8rem' : '0.9rem' }}
+                      >
+                        {album.song_count ?? 0}
+                      </Typography>
+                    </TableCell>
+                  )}
+
+                  {/* Actions */}
+                  <TableCell sx={styles.tableBodyCell} align="center">
+                    <Stack
+                      direction={isMobile ? 'column' : 'row'}
+                      justifyContent="center"
+                      alignItems="center"
+                      spacing={isMobile ? 1 : 1.5}
+                      sx={{
+                        width: '100%',
+                        '& > button': {
+                          flex: 1,
+                          minWidth: isMobile ? '100%' : 'auto',
+                        },
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={styles.editButton}
+                        onClick={() => onOpenEditAlbumModal(album.id)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        sx={styles.deleteButton}
+                        onClick={() => onDeleteAlbum(album.id)}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={styles.noDataCell}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: isMobile ? '0.85rem' : '0.95rem' }}
+                  >
+                    No albums found.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
         </Table>
       </TableContainer>
 
-      {/* 🔹 Pagination */}
+      {/* 🔢 Pagination */}
       {totalPages > 1 && (
         <Pagination
           count={totalPages}
           page={page}
           onChange={(e, value) => onPageChange(value)}
+          color="primary"
           sx={styles.pagination}
         />
       )}

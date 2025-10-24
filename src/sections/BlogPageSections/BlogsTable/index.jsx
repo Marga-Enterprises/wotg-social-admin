@@ -1,12 +1,7 @@
-// react
 import React from 'react';
-
-// react-router-dom
-import { Link as RouterLink } from 'react-router-dom';
-
-// mui
 import {
   Box,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -15,16 +10,14 @@ import {
   TableRow,
   Paper,
   Pagination,
-  Stack,
   Typography,
   Button,
   Avatar,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-
-// styles
+import { Link as RouterLink } from 'react-router-dom';
 import styles from './styles';
-
-// components
 import LoadingScreen from '@components/common/LoadingScreen';
 
 const BlogsTableSection = ({
@@ -36,120 +29,173 @@ const BlogsTableSection = ({
   onDeleteBlog,
   onPageChange,
 }) => {
-  // 🔹 Loading state
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (loading) return <LoadingScreen />;
-
-  // 🔹 Render Blog Rows
-  const renderBlogRows = () => {
-    if (blogs.length === 0) {
-      return (
-        <TableRow>
-          <TableCell colSpan={5} align="center" sx={styles.tableBodyCell}>
-            No blogs found.
-          </TableCell>
-        </TableRow>
-      );
-    }
-
-    return blogs.map((blog) => {
-      const {
-        id,
-        blog_title,
-        blog_thumbnail,
-        blog_release_date_and_time,
-        blog_approved,
-      } = blog;
-
-      const formattedDate = new Date(blog_release_date_and_time).toLocaleDateString(
-        'en-US',
-        { year: 'numeric', month: 'long', day: 'numeric' }
-      );
-
-      const statusColor = blog_approved
-        ? styles.statusDotActive.backgroundColor
-        : styles.statusDotInactive.backgroundColor;
-
-      return (
-        <TableRow key={id} hover sx={styles.tableRowHover}>
-          {/* Thumbnail */}
-          <TableCell sx={styles.tableBodyCell}>
-            <Avatar
-              variant="rounded"
-              alt={blog_title}
-              src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${blog_thumbnail}`}
-              sx={{ width: 56, height: 56 }}
-            />
-          </TableCell>
-
-          {/* Title */}
-          <TableCell sx={styles.tableBodyCell}>
-            <Typography variant="subtitle2" noWrap>
-              {blog_title}
-            </Typography>
-          </TableCell>
-
-          {/* Release Date */}
-          <TableCell sx={styles.tableBodyCell}>{formattedDate}</TableCell>
-
-          {/* Status */}
-          <TableCell sx={styles.tableBodyCell}>
-            <Box sx={{ ...styles.statusDot, backgroundColor: statusColor }} />
-          </TableCell>
-
-          {/* Actions */}
-          <TableCell sx={styles.tableBodyCell}>
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="contained"
-                size="small"
-                component={RouterLink}
-                to={`/blogs/edit/${id}`}
-                sx={styles.actionButtonEdit}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => onDeleteBlog(id)}
-                sx={styles.actionButtonDelete}
-              >
-                Delete
-              </Button>
-            </Stack>
-          </TableCell>
-        </TableRow>
-      );
-    });
-  };
 
   return (
     <Box sx={styles.root}>
-      {/* 🔹 Header Section */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Button variant="contained" sx={styles.addButton} onClick={openAddBlogModal}>
+      {/* 📰 Header */}
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        mb={2}
+        spacing={1.5}
+      >
+        <Button
+          variant="contained"
+          sx={styles.addButton}
+          onClick={openAddBlogModal}
+          fullWidth={isMobile}
+        >
           + Create New Blog
         </Button>
       </Stack>
 
-      {/* 🔹 Table Section */}
-      <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table size="small">
+      {/* 🧾 Blogs Table */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          ...styles.tableContainer,
+          overflowX: isMobile ? 'auto' : 'visible',
+        }}
+      >
+        <Table stickyHeader size="small" sx={styles.table}>
           <TableHead>
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>Thumbnail</TableCell>
               <TableCell sx={styles.tableHeadCell}>Title</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Release Date</TableCell>
+              {!isMobile && (
+                <TableCell sx={styles.tableHeadCell}>Release Date</TableCell>
+              )}
               <TableCell sx={styles.tableHeadCell}>Approved</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
 
-          <TableBody>{renderBlogRows()}</TableBody>
+          <TableBody>
+            {blogs.length > 0 ? (
+              blogs.map((blog) => {
+                const {
+                  id,
+                  blog_title,
+                  blog_thumbnail,
+                  blog_release_date_and_time,
+                  blog_approved,
+                } = blog;
+
+                const formattedDate = new Date(
+                  blog_release_date_and_time
+                ).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                });
+
+                return (
+                  <TableRow key={id} hover sx={styles.tableRow}>
+                    {/* Thumbnail */}
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Avatar
+                        variant="rounded"
+                        alt={blog_title}
+                        src={`https://wotg.sgp1.cdn.digitaloceanspaces.com/images/${blog_thumbnail}`}
+                        sx={styles.thumbnail}
+                      />
+                    </TableCell>
+
+                    {/* Title */}
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          ...styles.titleText,
+                          fontSize: isMobile ? '0.85rem' : '0.95rem',
+                        }}
+                        noWrap
+                      >
+                        {blog_title}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Release Date */}
+                    {!isMobile && (
+                      <TableCell sx={styles.tableBodyCell}>
+                        {formattedDate}
+                      </TableCell>
+                    )}
+
+                    {/* Approved */}
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Box
+                        sx={{
+                          ...styles.statusDot,
+                          backgroundColor: blog_approved
+                            ? styles.statusDotActive.backgroundColor
+                            : styles.statusDotInactive.backgroundColor,
+                        }}
+                      />
+                    </TableCell>
+
+                    {/* Actions */}
+                    <TableCell sx={styles.tableBodyCell} align="center">
+                      <Stack
+                        direction="row"
+                        justifyContent="center"
+                        alignItems="center"
+                        spacing={1.2}
+                        sx={{
+                          flexWrap: 'wrap',
+                          '@media (max-width: 600px)': {
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            gap: '8px',
+                          },
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={styles.editButton}
+                          onClick={() => onOpenEditBlogModal(blog.id)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          sx={styles.deleteButton}
+                          onClick={() => onDeleteBlog(blog.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={styles.noDataCell}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: isMobile ? '0.85rem' : '0.95rem' }}
+                  >
+                    No blogs found.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
         </Table>
       </TableContainer>
 
-      {/* 🔹 Pagination Section */}
+      {/* 🔢 Pagination */}
       {totalPages > 1 && (
         <Pagination
           count={totalPages}

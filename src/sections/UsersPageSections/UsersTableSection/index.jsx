@@ -1,9 +1,7 @@
-// react
 import React from 'react';
-
-// mui
 import {
   Box,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -12,15 +10,12 @@ import {
   TableRow,
   Paper,
   Pagination,
-  Stack,
   Typography,
   Button,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-
-// styles
 import styles from './styles';
-
-// components
 import LoadingScreen from '@components/common/LoadingScreen';
 
 const UsersTableSection = ({
@@ -29,35 +24,59 @@ const UsersTableSection = ({
   page,
   totalPages,
   onPageChange,
-  createChatroom, // ✅ passed from parent (Page.jsx)
+  createChatroom,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (loading) return <LoadingScreen />;
 
   const getStatusStyle = (status) => {
     switch (status) {
       case 'abandoned':
-        return { label: 'Abandoned', color: '#d32f2f' }; // Red
+        return { label: 'Abandoned', color: '#d32f2f' };
       case 'no_contact':
-        return { label: 'No Contact', color: '#ed6c02' }; // Orange
+        return { label: 'No Contact', color: '#ed6c02' };
       case 'in_contact':
-        return { label: 'In Contact', color: '#0288d1' }; // Blue
+        return { label: 'In Contact', color: '#0288d1' };
       case 'active':
       default:
-        return { label: 'Active', color: '#2e7d32' }; // Green
+        return { label: 'Active', color: '#2e7d32' };
     }
   };
 
   return (
     <Box sx={styles.root}>
-      {/* 📋 Users Table */}
-      <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table size="small">
+      {/* Header */}
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        mb={2}
+        spacing={1.5}
+      >
+        <Typography variant="h6" sx={styles.headerTitle}>
+          Users List
+        </Typography>
+      </Stack>
+
+      {/* Table */}
+      <TableContainer
+        component={Paper}
+        sx={{
+          ...styles.tableContainer,
+          overflowX: isMobile ? 'auto' : 'visible',
+        }}
+      >
+        <Table stickyHeader size="small" sx={styles.table}>
           <TableHead>
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>#</TableCell>
               <TableCell sx={styles.tableHeadCell}>First Name</TableCell>
               <TableCell sx={styles.tableHeadCell}>Last Name</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Email</TableCell>
+              {!isMobile && (
+                <TableCell sx={styles.tableHeadCell}>Email</TableCell>
+              )}
               <TableCell sx={styles.tableHeadCell}>Status</TableCell>
               <TableCell sx={styles.tableHeadCell} align="center">
                 Action
@@ -69,58 +88,64 @@ const UsersTableSection = ({
             {users.length > 0 ? (
               users.map((user, index) => {
                 const { label, color } = getStatusStyle(user.guest_status);
-
                 return (
                   <TableRow key={user.id} hover sx={styles.tableRow}>
-                    {/* Index */}
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="body2" color="text.secondary">
-                        {(page - 1) * 10 + (index + 1)}
-                      </Typography>
+                      {(page - 1) * 10 + (index + 1)}
                     </TableCell>
 
-                    {/* First Name */}
                     <TableCell sx={styles.tableBodyCell}>
                       <Typography variant="subtitle2" sx={styles.titleText}>
                         {user.user_fname}
                       </Typography>
                     </TableCell>
 
-                    {/* Last Name */}
                     <TableCell sx={styles.tableBodyCell}>
                       <Typography variant="subtitle2" sx={styles.titleText}>
                         {user.user_lname}
                       </Typography>
                     </TableCell>
 
-                    {/* Email */}
+                    {!isMobile && (
+                      <TableCell sx={styles.tableBodyCell}>
+                        <Typography variant="body2" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      </TableCell>
+                    )}
+
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="body2" color="text.secondary">
-                        {user.email}
+                      <Typography
+                        variant="body2"
+                        sx={{ color, fontWeight: 600 }}
+                      >
+                        {label}
                       </Typography>
                     </TableCell>
 
-                    {/* Status */}
-                    <TableCell sx={styles.tableBodyCell}>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography
-                          variant="body2"
-                          sx={{ color, fontWeight: 600 }}
-                        >
-                          {label}
-                        </Typography>
-                      </Stack>
-                    </TableCell>
-
-                    {/* ✅ Action Button */}
                     <TableCell sx={styles.tableBodyCell} align="center">
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => createChatroom(user.id)}
+                      <Stack
+                        direction={isMobile ? 'column' : 'row'}
+                        justifyContent="center"
+                        alignItems="center"
+                        spacing={isMobile ? 1 : 1.5}
+                        sx={{
+                          width: '100%',
+                          '& > button': {
+                            flex: 1,
+                            minWidth: isMobile ? '100%' : 'auto',
+                          },
+                        }}
                       >
-                        Create Chatroom
-                      </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          sx={styles.createButton}
+                          onClick={() => createChatroom(user.id)}
+                        >
+                          Create Chatroom
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 );
@@ -128,7 +153,11 @@ const UsersTableSection = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={styles.noDataCell}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontSize: isMobile ? '0.85rem' : '0.95rem' }}
+                  >
                     No users found.
                   </Typography>
                 </TableCell>
@@ -138,14 +167,15 @@ const UsersTableSection = ({
         </Table>
       </TableContainer>
 
-      {/* 📄 Pagination */}
-      <Pagination
-        count={totalPages}
-        page={page}
-        onChange={(e, value) => onPageChange(value)}
-        color="primary"
-        sx={styles.pagination}
-      />
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Pagination
+          count={totalPages}
+          page={page}
+          onChange={(e, value) => onPageChange(value)}
+          sx={styles.pagination}
+        />
+      )}
     </Box>
   );
 };

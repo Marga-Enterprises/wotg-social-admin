@@ -19,6 +19,7 @@ import {
   Typography,
   Button,
 } from '@mui/material';
+import PlayCircleFilledWhiteIcon from '@mui/icons-material/PlayCircleFilledWhite';
 
 // components
 import LoadingScreen from '@components/common/LoadingScreen';
@@ -42,19 +43,20 @@ const PostsTableSection = ({
 
   return (
     <Box sx={styles.root}>
-      {/* Header */}
+      {/* 🔹 Header */}
       <Stack
-        direction="row"
+        direction={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
-        alignItems="center"
+        alignItems={{ xs: 'stretch', sm: 'center' }}
         sx={styles.headerWrapper}
+        spacing={1.5}
       >
         <Box>
           <Typography variant="h6" sx={styles.headerTitle}>
             Post Management
           </Typography>
           <Typography variant="body2" sx={styles.headerSubtitle}>
-            View, edit, and schedule all community posts and media updates.
+            Manage all your posts, videos, and scheduled updates.
           </Typography>
         </Box>
 
@@ -63,15 +65,18 @@ const PostsTableSection = ({
         </Button>
       </Stack>
 
-      {/* Table */}
+      {/* 🔹 Table */}
       <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell sx={styles.tableHeadCell}>Media</TableCell>
               <TableCell sx={styles.tableHeadCell}>Caption</TableCell>
               <TableCell sx={styles.tableHeadCell}>Release Date</TableCell>
-              <TableCell sx={styles.tableHeadCell}>Actions</TableCell>
+              <TableCell sx={styles.tableHeadCell}>Status</TableCell>
+              <TableCell sx={styles.tableHeadCell} align="center">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -96,26 +101,39 @@ const PostsTableSection = ({
                   mediaUrl = `${cdnUrl}${folder}/${latestMedia.url}`;
                 }
 
+                const status = post.status || 'Published';
+                const statusColor =
+                  status === 'Scheduled'
+                    ? '#e67e22'
+                    : status === 'Draft'
+                    ? '#777'
+                    : '#cc0000';
+
                 return (
                   <TableRow key={post.id} hover sx={styles.tableRow}>
-                    {/* Media */}
+                    {/* 🎞️ Media Preview */}
                     <TableCell sx={{ ...styles.tableBodyCell, ...styles.mediaCell }}>
                       {mediaUrl ? (
-                        latestMedia.type === 'video' ? (
-                          <Box
-                            component="video"
-                            src={mediaUrl}
-                            controls
-                            sx={styles.mediaPreview}
-                          />
-                        ) : (
-                          <Box
-                            component="img"
-                            src={mediaUrl}
-                            alt="Post Media"
-                            sx={styles.mediaPreview}
-                          />
-                        )
+                        <Box sx={styles.mediaWrapper}>
+                          {latestMedia.type === 'video' ? (
+                            <>
+                              <Box
+                                component="video"
+                                src={mediaUrl}
+                                muted
+                                sx={styles.mediaPreview}
+                              />
+                              <PlayCircleFilledWhiteIcon sx={styles.playIcon} />
+                            </>
+                          ) : (
+                            <Box
+                              component="img"
+                              src={mediaUrl}
+                              alt="Post Media"
+                              sx={styles.mediaPreview}
+                            />
+                          )}
+                        </Box>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           No media
@@ -123,18 +141,18 @@ const PostsTableSection = ({
                       )}
                     </TableCell>
 
-                    {/* Caption */}
+                    {/* ✏️ Caption */}
                     <TableCell sx={styles.tableBodyCell}>
                       <Typography variant="body2" sx={styles.captionText}>
                         {post.content
-                          ? post.content.length > 300
-                            ? `${post.content.substring(0, 300)}…`
+                          ? post.content.length > 250
+                            ? `${post.content.substring(0, 250)}…`
                             : post.content
                           : 'No caption'}
                       </Typography>
                     </TableCell>
 
-                    {/* Release Date */}
+                    {/* 📅 Release Date */}
                     <TableCell sx={styles.tableBodyCell}>
                       <Typography variant="body2" sx={styles.dateText}>
                         {post.release_date
@@ -147,14 +165,25 @@ const PostsTableSection = ({
                       </Typography>
                     </TableCell>
 
-                    {/* Actions */}
+                    {/* 🏷️ Status */}
                     <TableCell sx={styles.tableBodyCell}>
-                      <Stack direction="row" spacing={1.2}>
+                      <Box
+                        sx={{
+                          ...styles.statusChip,
+                          backgroundColor: statusColor,
+                        }}
+                      >
+                        {status}
+                      </Box>
+                    </TableCell>
+
+                    {/* ⚙️ Actions */}
+                    <TableCell sx={{ ...styles.tableBodyCell, ...styles.actionsCell }}>
+                      <Box sx={styles.actionsWrapper}>
                         <Button
                           variant="contained"
                           size="small"
                           sx={styles.editButton}
-                          component={RouterLink}
                           onClick={() => onOpenEditPostModal(post.id)}
                         >
                           Edit
@@ -162,20 +191,19 @@ const PostsTableSection = ({
                         <Button
                           variant="outlined"
                           size="small"
-                          color="error"
                           sx={styles.deleteButton}
                           onClick={() => onDeletePost(post.id)}
                         >
                           Delete
                         </Button>
-                      </Stack>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={styles.tableBodyCell}>
+                <TableCell colSpan={5} align="center" sx={styles.tableBodyCell}>
                   <Typography variant="body2" color="text.secondary">
                     No posts found.
                   </Typography>
@@ -186,7 +214,7 @@ const PostsTableSection = ({
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
+      {/* 🔹 Pagination */}
       <Pagination
         count={totalPages}
         page={page}
