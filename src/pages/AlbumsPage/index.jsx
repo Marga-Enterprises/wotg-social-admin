@@ -1,5 +1,5 @@
 // react
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 // router
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ import EditAlbumFormModal from '@components/albums/EditAlbumFormModal';
 
 // sections
 import AlbumsTableSection from '@sections/AlbumsPageSections/AlbumsTableSection';
+import AlbumFiltersSection from '@sections/AlbumsPageSections/AlbumsFiltersSection';
 
 // styles
 import styles from './styles';
@@ -45,13 +46,43 @@ const Page = () => {
     handleUpdateAlbum,
   } = useLogic();
 
-  // fetch albums based on query params
-  useEffect(() => {
+  // 🧭 Extract URL params (for sync)
+  const getQueryParams = useCallback(() => {
     const queryParams = new URLSearchParams(location.search);
-    const currentPage = parseInt(queryParams.get('page')) || 1;
-    const search = queryParams.get('search') || '';
-    handleFetchAlbums(currentPage, search);
-  }, [location.search, handleFetchAlbums]);
+    return {
+      page: parseInt(queryParams.get('page')) || 1,
+      search: queryParams.get('search') || '',
+    };
+  }, [location.search]);
+
+  // 🧠 Fetch albums whenever params change
+  useEffect(() => {
+    const { page, search } = getQueryParams();
+    handleFetchAlbums(page, search);
+  }, [getQueryParams, handleFetchAlbums]);
+
+  // 🔍 Handle filter changes (search)
+  const handleFilterChange = (filters) => {
+    const params = new URLSearchParams(location.search);
+    const { search, trigger } = filters;
+
+    if (trigger === 'reset') {
+      params.delete('search');
+      params.set('page', 1);
+    } else if (trigger === 'manual') {
+      params.set('search', search.trim());
+      params.set('page', 1);
+    }
+
+    navigate(`?${params.toString()}`);
+  };
+
+  // 🔢 Handle page change
+  const handlePageChange = (newPage) => {
+    const params = new URLSearchParams(location.search);
+    params.set('page', newPage);
+    navigate(`?${params.toString()}`);
+  };
 
   return (
     <Box sx={styles.container}>
@@ -64,6 +95,12 @@ const Page = () => {
           View, edit, and organize all uploaded albums.
         </Typography>
       </Stack>
+
+      {/* 🔍 Search Filter Section */}
+      <AlbumFiltersSection
+        initialFilters={{ search: getQueryParams().search }}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* ➕ Add Album Modal */}
       <AddAlbumFormModal
@@ -94,11 +131,7 @@ const Page = () => {
         openAddAlbumModal={handleOpenAddAlbumModal}
         onDeleteAlbum={handleDeleteAlbum}
         onOpenEditAlbumModal={handleOpenEditAlbumModal}
-        onPageChange={(newPage) => {
-          const params = new URLSearchParams(location.search);
-          params.set('page', newPage);
-          navigate(`?${params.toString()}`);
-        }}
+        onPageChange={handlePageChange}
       />
     </Box>
   );
