@@ -114,7 +114,13 @@ const BlogsDetailsForm = ({
             label="Release Date"
             name="blog_release_date_and_time"
             type="date"
-            value={formValues.blog_release_date_and_time || ''}
+            value={
+              formValues.blog_release_date_and_time
+                ? new Date(formValues.blog_release_date_and_time)
+                    .toISOString()
+                    .split('T')[0]
+                : ''
+            }
             onChange={onInputChange}
             fullWidth
             InputLabelProps={{ shrink: true }}

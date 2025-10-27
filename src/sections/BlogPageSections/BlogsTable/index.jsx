@@ -161,7 +161,9 @@ const BlogsTableSection = ({
                           variant="contained"
                           size="small"
                           sx={styles.editButton}
-                          onClick={() => onOpenEditBlogModal(blog.id)}
+                          onClick={() => {}}
+                          component={RouterLink}
+                          to={`/blogs/edit/${id}`}
                         >
                           Edit
                         </Button>
