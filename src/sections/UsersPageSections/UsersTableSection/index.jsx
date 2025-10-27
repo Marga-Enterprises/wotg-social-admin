@@ -137,14 +137,28 @@ const UsersTableSection = ({
                           },
                         }}
                       >
-                        <Button
-                          variant="contained"
-                          size="small"
-                          sx={styles.createButton}
-                          onClick={() => createChatroom(user.id)}
-                        >
-                          Create Chatroom
-                        </Button>
+                        {
+                          // Disable chatroom creation for abandoned users
+                          user.guest_status === 'abandoned' ? (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              sx={styles.disabledButton}
+                              disabled
+                            >
+                              Create Chatroom
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              sx={styles.createButton}
+                              onClick={() => createChatroom(user.id)}
+                            >
+                              Create Chatroom
+                            </Button>
+                          )
+                        }
                       </Stack>
                     </TableCell>
                   </TableRow>
