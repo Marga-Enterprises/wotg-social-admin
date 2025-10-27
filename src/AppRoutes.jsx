@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 // routers
 import AuthRouter from '@routers/AuthRouter';
+import AdminRouter from '@routers/AdminRouter';
 import NonAuthRouter from '@routers/NonAuthRouter';
 
 // pages
@@ -46,9 +47,9 @@ function AppRoutes() {
       <Route
         path="/blogs"
         element={
-          <AuthRouter>
+          <AdminRouter>
             <MainLayout />
-          </AuthRouter>
+          </AdminRouter>
         }
       >
         <Route index element={<BlogsPage />} />
@@ -57,9 +58,9 @@ function AppRoutes() {
       <Route
         path="/blogs/edit/:id"
         element={
-          <AuthRouter>
+          <AdminRouter>
             <MainLayout />
-          </AuthRouter>
+          </AdminRouter>
         }
       >
         <Route index element={<EditBlogPage />} />
@@ -68,9 +69,9 @@ function AppRoutes() {
       <Route
         path="/albums"
         element={
-          <AuthRouter>
+          <AdminRouter>
             <MainLayout />
-          </AuthRouter>
+          </AdminRouter>
         }
       >
         <Route index element={<AlbumsPage />} />
@@ -79,9 +80,9 @@ function AppRoutes() {
       <Route
         path="/musics"
         element={
-          <AuthRouter>
+          <AdminRouter>
             <MainLayout />
-          </AuthRouter>
+          </AdminRouter>
         }
       >
         <Route index element={<MusicsPage />} />
@@ -90,9 +91,9 @@ function AppRoutes() {
       <Route
         path="/posts"
         element={
-          <AuthRouter>
+          <AdminRouter>
             <MainLayout />
-          </AuthRouter>
+          </AdminRouter>
         }
       >
         <Route index element={<PostsPage />} />

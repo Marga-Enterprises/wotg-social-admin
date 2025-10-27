@@ -41,8 +41,6 @@ export const loginAction = (payload) => async (dispatch) => {
   try {
     const res = await loginService(payload);
 
-    console.log('LOGIN SERVICE RESPONSE: ', res);
-
     const { success, data } = res;
 
     if (success) {

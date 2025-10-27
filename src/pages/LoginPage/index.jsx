@@ -9,6 +9,9 @@ import { marga } from '@redux/combineActions';
 import LoadingScreen from '@components/common/LoadingScreen';
 import SnackbarAlert from '@components/common/SnackbarAlert';
 
+// react-router
+import { useNavigate } from 'react-router-dom';
+
 // mui
 import {
   Container,
@@ -25,6 +28,7 @@ import '@fontsource/orbitron';
 
 const Page = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const loadingRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
@@ -49,10 +53,8 @@ const Page = () => {
     setLoading(true);
 
     dispatch(marga.user.loginAction(formData)).then((res) => {
-      console.log('RESPONSE IN LOGIN: ', res);
-
       if (res.success) {
-        window.location.href = '/';
+        navigate('/');
       } else {
         setOpenSnackbar(true);
         setMessage(res.payload);

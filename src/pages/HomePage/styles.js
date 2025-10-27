@@ -81,6 +81,21 @@ const styles = {
     },
   },
 
+  // 🟥 Disabled Card (for restricted users)
+  cardBoxDisabled: {
+    pointerEvents: 'none',
+    opacity: 0.5,
+    filter: 'grayscale(1)',
+    cursor: 'not-allowed',
+    transform: 'none',
+    boxShadow: 'none',
+    '&:hover': {
+      transform: 'none',
+      boxShadow: 'none',
+      '&:before': { opacity: 0 },
+    },
+  },
+
   // 🟥 Icon & Label Styling
   cardIcon: {
     fontSize: 60,

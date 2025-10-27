@@ -1,20 +1,24 @@
+import Cookies from 'js-cookie';
 import * as types from '@redux/types';
 
+const savedAccount = Cookies.get('account') ? JSON.parse(Cookies.get('account')) : null;
+const isAuthenticated = Cookies.get('authenticated') === 'true';
+
 const initialState = {
-  authenticated: false,
+  authenticated: isAuthenticated,
   error: null,
-  user: {},
-  users: [], // This is where we'll store the list of users
-  loading: false, // This will be used to track loading state for the users fetch
+  user: savedAccount || {},
+  users: [],
+  loading: false,
 };
 
 const reducer = (state = initialState, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case types.LOGIN_REQUEST:
       return { ...state, loading: true };
 
     case types.LOGIN_SUCCESS:
-      return { ...state, loading: false, user: action.payload };
+      return { ...state, loading: false, user: action.payload, authenticated: true };
 
     case types.SET_USER_DETAILS:
       return { ...state, ...action.payload, authenticated: true };
@@ -22,9 +26,12 @@ const reducer = (state = initialState, action) => {
     case types.LOGIN_FAIL:
       return { ...state, loading: false, error: action.payload };
 
+    case 'USER_LOGOUT':
+      return { ...state, authenticated: false, user: {} };
+
     default:
       return state;
   }
-}
+};
 
 export default reducer;

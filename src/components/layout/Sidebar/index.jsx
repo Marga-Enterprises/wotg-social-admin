@@ -24,11 +24,13 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from 'react-router-dom';
 
 // redux imports
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { marga } from '@redux/combineActions';
 
 const Sidebar = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.marga);
+  const role = user?.user_role || user?.user?.user_role;
 
   const handleLogout = () => {
     dispatch(marga.user.logoutAction());
@@ -56,20 +58,35 @@ const Sidebar = ({ open, onClose }) => {
       <List sx={styles.menuList}>
         {options.map((option, index) => {
           const Icon = option.icon;
+
+          // ✅ Non-admin/owner can access only Home & Users
+          const isRestricted =
+            !(role === 'admin' || role === 'owner') &&
+            option.label !== 'Home' &&
+            option.label !== 'Users';
+
           return (
             <ListItem key={index} disablePadding>
               <ListItemButton
                 component={Link}
-                to={option.path}
-                onClick={onClose}
-                sx={styles.listButton}
+                to={isRestricted ? '#' : option.path}
+                onClick={isRestricted ? undefined : onClose}
+                sx={[
+                  styles.listButton,
+                  isRestricted && styles.listButtonDisabled,
+                ]}
               >
                 <ListItemIcon sx={styles.listIcon}>
                   <Icon />
                 </ListItemIcon>
                 <ListItemText
                   primary={option.label}
-                  primaryTypographyProps={{ sx: styles.listText }}
+                  primaryTypographyProps={{
+                    sx: [
+                      styles.listText,
+                      isRestricted && styles.listTextDisabled,
+                    ],
+                  }}
                 />
               </ListItemButton>
             </ListItem>

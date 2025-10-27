@@ -96,6 +96,21 @@ const styles = {
     fontWeight: 600,
     color: '#b71c1c',
   },
+
+  listButtonDisabled: {
+    pointerEvents: 'none',
+    opacity: 0.5,
+    filter: 'grayscale(1)',
+    cursor: 'not-allowed',
+    transition: 'none',
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
+  },
+
+  listTextDisabled: {
+    color: '#999 !important',
+  },
 };
 
 export default styles;
