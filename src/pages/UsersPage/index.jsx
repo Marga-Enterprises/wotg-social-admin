@@ -17,18 +17,25 @@ import { useLogic } from './useLogic';
 import UsersTableSection from '@sections/UsersPageSections/UsersTableSection';
 import UsersFiltersSection from '@sections/UsersPageSections/UsersFiltersSection';
 
+// components 
+import SendMessageToUserModal from '@components/users/SendMessageToUserModal';
+
 const Page = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   // pass navigate + location into logic
   const {
-    users,
     loading,
+    users,
     pageDetails,
+    selectedUserId,
+    messageModalOpen,
     handleFetchUsers,
     handleFilterChange,
-    handleCreateChatroom,
+    handleShowMessageModal,
+    handleCloseMessageModal,
+    handleCreateChatroomAndSendMessage,
   } = useLogic(navigate, location);
 
   // 🔄 Fetch users when query params change
@@ -76,12 +83,20 @@ const Page = () => {
         users={users}
         page={pageDetails.pageIndex}
         totalPages={pageDetails.totalPages}
-        createChatroom={handleCreateChatroom}
+        showMessageModal={handleShowMessageModal}
         onPageChange={(newPage) => {
           const params = new URLSearchParams(location.search);
           params.set('page', newPage);
           navigate(`?${params.toString()}`);
         }}
+      />
+
+      {/* ✉️ Send Message To User Modal */}
+      <SendMessageToUserModal
+        userId={selectedUserId}
+        open={messageModalOpen}
+        onClose={handleCloseMessageModal}
+        onSendMessage={handleCreateChatroomAndSendMessage}
       />
     </Box>
   );

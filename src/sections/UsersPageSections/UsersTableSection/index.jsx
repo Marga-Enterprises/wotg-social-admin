@@ -23,7 +23,7 @@ const UsersTableSection = ({
   page,
   totalPages,
   onPageChange,
-  createChatroom,
+  showMessageModal,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -90,7 +90,7 @@ const UsersTableSection = ({
                   <TableRow
                     key={user.id}
                     hover
-                    onClick={() => !isAbandoned && createChatroom(user.id)}
+                    onClick={() => !isAbandoned && showMessageModal(user.id)}
                     sx={{
                       ...styles.tableRow,
                       cursor: isAbandoned ? 'not-allowed' : 'pointer',

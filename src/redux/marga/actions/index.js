@@ -5,6 +5,7 @@ import * as album from './album';
 import * as music from './music';
 import * as post from './post';
 import * as chatroom from './chatroom';
+import * as message from './message';
 
 export {
   user,
@@ -13,5 +14,6 @@ export {
   album,
   music,
   post,
-  chatroom
+  chatroom,
+  message
 };

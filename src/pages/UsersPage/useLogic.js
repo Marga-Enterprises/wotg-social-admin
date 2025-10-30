@@ -24,6 +24,11 @@ export const useLogic = (navigate, location) => {
   // 🧠 States
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [severity, setSeverity] = useState('success');
+  const [message, setMessage] = useState('');
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [pageDetails, setPageDetails] = useState({
     totalRecords: 0,
     pageIndex: 1,
@@ -103,11 +108,11 @@ export const useLogic = (navigate, location) => {
     [navigate, location.search]
   );
 
-  // Handle Create Private Chatroom
-  const handleCreateChatroom = useCallback(
-    async (targetUserId) => {
+  // 🧠 Handle Create Private Chatroom + Send Message
+  const handleCreateChatroomAndSendMessage = useCallback(
+    async (content, targetUserId) => {
       if (!currentUser?.id) {
-        alert('Please login first.');
+        alert("Please login first.");
         return;
       }
 
@@ -117,52 +122,91 @@ export const useLogic = (navigate, location) => {
           target_user_id: targetUserId,
         };
 
+        const baseUrl =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:3000/chat"
+            : "https://community.wotgonline.com/chat";
+
         const res = await dispatch(marga.chatroom.createChatroomAction(payload));
 
+        // Chatroom variables
+        let chatId, chatUrl, tabName;
+
         if (res?.success && res?.data?.id) {
-          const chatId = res.data.id;
-          const baseUrl =
-            process.env.NODE_ENV === 'development'
-              ? 'http://localhost:3000/chat'
-              : 'https://community.wotgonline.com/chat';
+          // 🆕 Chatroom successfully created
+          chatId = res.data.id;
+          console.log("✅ New chatroom created:", chatId);
+        } else {
+          // ♻️ Chatroom already exists
+          chatId = res?.error?.data?.chatroomId;
+          console.log("ℹ️ Chatroom already exists:", chatId);
+        }
 
-          const chatUrl = `${baseUrl}?chat=${chatId}`;
-          const tabName = `chat_${chatId}`;
+        // 🧠 Construct chat URL + tab name
+        chatUrl = `${baseUrl}?chat=${chatId}`;
+        tabName = `chat_${chatId}`;
 
-          // ✅ Always try to open new tab (unique per chat)
-          const newTab = window.open(chatUrl, tabName, 'noopener,noreferrer');
+        // ✉️ Send message to chatroom (always)
+        await dispatch(
+          marga.message.sendMessageAction({
+            chatroomId: chatId,
+            senderId: currentUser.id,
+            content,
+            type: "text",
+          })
+        );
 
-          // ✅ Popup blocked fallback: open manually without changing admin page
-          if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-            // create a temporary link and trigger click (no redirect in admin)
-            const tempLink = document.createElement('a');
+        // 🔗 Open chat in a new tab
+        const openChatTab = () => {
+          const newTab = window.open(chatUrl, tabName, "noopener,noreferrer");
+
+          if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
+            // 🧩 Fallback if popup is blocked
+            const tempLink = document.createElement("a");
             tempLink.href = chatUrl;
-            tempLink.target = '_blank';
-            tempLink.rel = 'noopener noreferrer';
+            tempLink.target = "_blank";
+            tempLink.rel = "noopener noreferrer";
             document.body.appendChild(tempLink);
             tempLink.click();
             document.body.removeChild(tempLink);
           }
+        };
 
-          // ✅ Just refresh admin page — no URL change
-          setTimeout(() => {
-            window.location.reload();
-          }, 500);
-        }
+        openChatTab();
+
+        // reload page to reflect any changes
+        // EsetTimeout(() => { window.location.reload();E}, 500);
+        console.log("✅ Message sent and chat opened:", chatUrl);
       } catch (err) {
-        console.error('❌ Create chatroom error:', err);
+        console.error("❌ Error creating or sending message:", err);
       }
     },
     [dispatch, currentUser]
   );
+
+  // handle show message modal
+  const handleShowMessageModal = useCallback((userId) => {
+    setSelectedUserId(userId);
+    setMessageModalOpen(true);
+  }, []);
+
+  // handle close message modal
+  const handleCloseMessageModal = useCallback(() => {
+    setSelectedUserId(null);
+    setMessageModalOpen(false);
+  }, []);
 
 
   return {
     loading,
     users,
     pageDetails,
+    selectedUserId,
+    messageModalOpen,
     handleFetchUsers,
     handleFilterChange,
-    handleCreateChatroom,
+    handleShowMessageModal,
+    handleCloseMessageModal,
+    handleCreateChatroomAndSendMessage,
   };
 };

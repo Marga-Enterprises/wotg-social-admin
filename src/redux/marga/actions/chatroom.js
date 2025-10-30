@@ -10,6 +10,6 @@ export const createChatroomAction = (payload) => async () => {
         const res = await createChatroomService(payload);
         return res;
     } catch (err) {
-        return { error: err.response?.data?.msg };
+        return { error: err.response?.data };
     }
 }; 
