@@ -65,26 +65,6 @@ const styles = {
     color: '#222',
   },
 
-  createButton: {
-    textTransform: 'none',
-    fontWeight: 600,
-    borderRadius: 2,
-    px: 2.5,
-    py: 0.7,
-    color: '#fff',
-    background: 'linear-gradient(135deg, #b71c1c, #d32f2f)',
-    boxShadow: '0 3px 8px rgba(211,47,47,0.3)',
-    transition: 'all 0.25s ease',
-    '&:hover': {
-      background: 'linear-gradient(135deg, #9c1c1c, #c62828)',
-      boxShadow: '0 4px 10px rgba(211,47,47,0.35)',
-      transform: 'translateY(-1px)',
-    },
-    '&:active': {
-      transform: 'translateY(1px)',
-    },
-  },
-
   noDataCell: {
     py: 4,
     backgroundColor: '#fffafa',

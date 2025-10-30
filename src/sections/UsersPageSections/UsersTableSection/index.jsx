@@ -11,7 +11,6 @@ import {
   Paper,
   Pagination,
   Typography,
-  Button,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -78,9 +77,6 @@ const UsersTableSection = ({
                 <TableCell sx={styles.tableHeadCell}>Email</TableCell>
               )}
               <TableCell sx={styles.tableHeadCell}>Status</TableCell>
-              <TableCell sx={styles.tableHeadCell} align="center">
-                Action
-              </TableCell>
             </TableRow>
           </TableHead>
 
@@ -88,8 +84,24 @@ const UsersTableSection = ({
             {users.length > 0 ? (
               users.map((user, index) => {
                 const { label, color } = getStatusStyle(user.guest_status);
+                const isAbandoned = user.guest_status === 'abandoned';
+
                 return (
-                  <TableRow key={user.id} hover sx={styles.tableRow}>
+                  <TableRow
+                    key={user.id}
+                    hover
+                    onClick={() => !isAbandoned && createChatroom(user.id)}
+                    sx={{
+                      ...styles.tableRow,
+                      cursor: isAbandoned ? 'not-allowed' : 'pointer',
+                      opacity: isAbandoned ? 0.6 : 1,
+                      '&:hover': {
+                        backgroundColor: isAbandoned
+                          ? 'inherit'
+                          : 'rgba(0,0,0,0.04)',
+                      },
+                    }}
+                  >
                     <TableCell sx={styles.tableBodyCell}>
                       {(page - 1) * 10 + (index + 1)}
                     </TableCell>
@@ -122,51 +134,12 @@ const UsersTableSection = ({
                         {label}
                       </Typography>
                     </TableCell>
-
-                    <TableCell sx={styles.tableBodyCell} align="center">
-                      <Stack
-                        direction={isMobile ? 'column' : 'row'}
-                        justifyContent="center"
-                        alignItems="center"
-                        spacing={isMobile ? 1 : 1.5}
-                        sx={{
-                          width: '100%',
-                          '& > button': {
-                            flex: 1,
-                            minWidth: isMobile ? '100%' : 'auto',
-                          },
-                        }}
-                      >
-                        {
-                          // Disable chatroom creation for abandoned users
-                          user.guest_status === 'abandoned' ? (
-                            <Button
-                              variant="contained"
-                              size="small"
-                              sx={styles.disabledButton}
-                              disabled
-                            >
-                              Create Chatroom
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="contained"
-                              size="small"
-                              sx={styles.createButton}
-                              onClick={() => createChatroom(user.id)}
-                            >
-                              Create Chatroom
-                            </Button>
-                          )
-                        }
-                      </Stack>
-                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={styles.noDataCell}>
+                <TableCell colSpan={5} align="center" sx={styles.noDataCell}>
                   <Typography
                     variant="body2"
                     color="text.secondary"
