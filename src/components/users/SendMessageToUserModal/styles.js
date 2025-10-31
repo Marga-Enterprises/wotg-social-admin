@@ -41,6 +41,13 @@ const styles = {
     textTransform: 'none',
     color: '#666',
   },
+  clearBtn: {
+    textTransform: 'none',
+    color: '#888',
+    '&:hover': {
+      backgroundColor: '#f3f3f3',
+    },
+  },
   saveBtn: {
     textTransform: 'none',
     fontWeight: 600,

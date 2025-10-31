@@ -24,27 +24,27 @@ const SendMessageToUserModal = ({ open, onClose, userId, onSendMessage }) => {
   const draftMessages = [
     {
       label: 'Greet',
-      text: `Hi there! I just wanted to drop by and say hello. How’s your day going so far? Hope you’re doing well!`,
+      text: `Hello kapatid! Kamusta ka? Nais ko lang batiin ka at ipaabot ang aking dalangin na sana ay nasa mabuti kang kalagayan at patuloy na pinagpapala ng Diyos.`,
     },
     {
       label: 'Ask Prayer',
-      text: `Hey! I was wondering if there’s anything I can pray for you about today. You can share anything — I’d love to lift it up in prayer.`,
+      text: `Kumusta kapatid! Mayroon ka bang gustong ipanalangin ko para sa iyo ngayon? Huwag kang mahiyang magbahagi — nais kong ipagdasal ka sa Panginoon.`,
     },
     {
       label: 'Invite',
-      text: `Hi! We’d love to see you at church this week. It’s always such a joy to worship and connect with others. Let me know if you’d like more details!`,
+      text: `Hi kapatid! Inaanyayahan kitang sumama sa aming pagsamba ngayong linggo. Isang magandang pagkakataon ito upang magpasalamat, sumamba, at makipag-fellowship sa iba.`,
     },
     {
       label: 'Devotion',
-      text: `Here’s something that might encourage you today — our latest devotion post: https://community.wotgonline.com/blogs. Take a few minutes to read and reflect. It might bless your heart.`,
+      text: `Kapatid, baka makatulong ito sa iyong araw — ang aming pinakabagong debosyon: https://community.wotgonline.com/blogs. Maglaan ng ilang minuto upang magbasa at magnilay. Nawa’y maging pagpapala ito sa iyo.`,
     },
     {
       label: 'Worship',
-      text: `If you need a moment to slow down and worship, you can join us here anytime: https://community.wotgonline.com/worship. Let this be your pause in God’s presence today.`,
+      text: `Kung gusto mong maglaan ng sandali upang manahimik at sumamba, maaari kang makiisa dito: https://community.wotgonline.com/worship. Hayaan mong punuin muli ng presensya ng Diyos ang iyong puso.`,
     },
     {
       label: 'WOTG Link',
-      text: `You can always connect with our growing community at https://community.wotgonline.com/. There’s a place here for you to grow, be encouraged, and belong.`,
+      text: `Maaari kang kumonekta sa ating online community sa https://community.wotgonline.com/. May lugar dito para sa’yo — upang lumago, ma-encourage, at mapalakas sa pananampalataya.`,
     },
   ];
 
@@ -57,6 +57,10 @@ const SendMessageToUserModal = ({ open, onClose, userId, onSendMessage }) => {
     onSendMessage(message, userId);
     setMessage('');
     onClose();
+  };
+
+  const handleClear = () => {
+    setMessage('');
   };
 
   return (
@@ -106,6 +110,9 @@ const SendMessageToUserModal = ({ open, onClose, userId, onSendMessage }) => {
       <DialogActions sx={styles.dialogActions}>
         <Button onClick={onClose} sx={styles.cancelBtn}>
           Cancel
+        </Button>
+        <Button onClick={handleClear} sx={styles.clearBtn}>
+          Clear
         </Button>
         <Button variant="contained" onClick={handleSend} sx={styles.saveBtn}>
           Send
