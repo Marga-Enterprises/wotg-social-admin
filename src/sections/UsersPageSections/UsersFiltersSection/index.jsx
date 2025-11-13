@@ -22,6 +22,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
   const [filters, setFilters] = useState({
     search: initialFilters?.search || '',
     guestAccount: initialFilters?.guestAccount || 'both',
+    dgroupFilter: initialFilters?.dgroupFilter || 'both',
     dateFrom: initialFilters?.dateFrom || today,
     dateTo: initialFilters?.dateTo || today,
   });
@@ -30,6 +31,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
     setFilters({
       search: initialFilters?.search || '',
       guestAccount: initialFilters?.guestAccount || 'both',
+      dgroupFilter: initialFilters?.dgroupFilter || 'both',
       dateFrom: initialFilters?.dateFrom || today,
       dateTo: initialFilters?.dateTo || today,
     });
@@ -37,8 +39,13 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
 
   useEffect(() => {
     onFilterChange({ ...filters, trigger: 'auto' });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.guestAccount, filters.dateFrom, filters.dateTo]);
+  }, [
+    filters.guestAccount,
+    filters.dgroupFilter,
+    filters.dateFrom,
+    filters.dateTo,
+    onFilterChange,
+  ]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,6 +64,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
     const reset = {
       search: '',
       guestAccount: 'both',
+      dgroupFilter: 'both',
       dateFrom: today,
       dateTo: today,
     };
@@ -67,7 +75,6 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
   return (
     <Box sx={styles.container}>
       {isMobile ? (
-        // 📱 STACKED (MOBILE)
         <Stack spacing={1} sx={{ width: '100%' }}>
           <TextField
             fullWidth
@@ -79,6 +86,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
             size="small"
             sx={styles.textField}
           />
+
           <FormControl fullWidth size="small" sx={styles.textField}>
             <InputLabel>Account Type</InputLabel>
             <Select
@@ -92,6 +100,21 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
               <MenuItem value="nonguest">Non-Guest</MenuItem>
             </Select>
           </FormControl>
+
+          <FormControl fullWidth size="small" sx={styles.textField}>
+            <InputLabel>D-Group Member</InputLabel>
+            <Select
+              label="D-Group Member"
+              name="dgroupFilter"
+              value={filters.dgroupFilter}
+              onChange={handleChange}
+            >
+              <MenuItem value="both">Both</MenuItem>
+              <MenuItem value="yes">Yes</MenuItem>
+              <MenuItem value="no">No</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             fullWidth
             label="From"
@@ -103,6 +126,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
             InputLabelProps={{ shrink: true }}
             sx={styles.textField}
           />
+
           <TextField
             fullWidth
             label="To"
@@ -114,17 +138,17 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
             InputLabelProps={{ shrink: true }}
             sx={styles.textField}
           />
+
           <Stack direction="row" spacing={1}>
-            <Button fullWidth variant="contained" onClick={handleSearchClick} sx={styles.searchButton}>
+            <Button fullWidth variant="contained" onClick={handleSearchClick}>
               Search
             </Button>
-            <Button fullWidth variant="outlined" color="error" onClick={handleReset} sx={styles.resetButton}>
+            <Button fullWidth variant="outlined" color="error" onClick={handleReset}>
               Reset
             </Button>
           </Stack>
         </Stack>
       ) : (
-        // 💻 INLINE (DESKTOP)
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm={4} md={3}>
             <TextField
@@ -138,8 +162,9 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
               sx={styles.textField}
             />
           </Grid>
-          <Grid item xs={12} sm={3} md={2}>
-            <FormControl fullWidth size="small" sx={styles.textField}>
+
+          <Grid item xs={12} sm={3} md="auto">
+            <FormControl size="small" sx={{ ...styles.textField, ...styles.filterShort }}>
               <InputLabel>Account Type</InputLabel>
               <Select
                 label="Account Type"
@@ -153,6 +178,23 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
               </Select>
             </FormControl>
           </Grid>
+
+          <Grid item xs={12} sm={3} md="auto">
+            <FormControl size="small" sx={{ ...styles.textField, ...styles.filterMedium }}>
+              <InputLabel>D-Group Member</InputLabel>
+              <Select
+                label="D-Group Member"
+                name="dgroupFilter"
+                value={filters.dgroupFilter}
+                onChange={handleChange}
+              >
+                <MenuItem value="both">Both</MenuItem>
+                <MenuItem value="yes">Yes</MenuItem>
+                <MenuItem value="no">No</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
           <Grid item xs={12} sm={2} md={2}>
             <TextField
               fullWidth
@@ -166,6 +208,7 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
               sx={styles.textField}
             />
           </Grid>
+
           <Grid item xs={12} sm={2} md={2}>
             <TextField
               fullWidth
@@ -179,12 +222,13 @@ const UsersFiltersSection = ({ onFilterChange, initialFilters }) => {
               sx={styles.textField}
             />
           </Grid>
+
           <Grid item xs={12} sm={3} md={3}>
             <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <Button variant="contained" onClick={handleSearchClick} sx={styles.searchButton}>
+              <Button variant="contained" onClick={handleSearchClick}>
                 Search
               </Button>
-              <Button variant="outlined" color="error" onClick={handleReset} sx={styles.resetButton}>
+              <Button variant="outlined" color="error" onClick={handleReset}>
                 Reset
               </Button>
             </Stack>

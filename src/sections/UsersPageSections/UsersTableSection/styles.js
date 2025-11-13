@@ -8,6 +8,13 @@ const styles = {
     overflowX: 'hidden',
   },
 
+  headerStack: {
+    direction: { xs: 'column', sm: 'row' },
+    justifyContent: 'space-between',
+    alignItems: { xs: 'stretch', sm: 'center' },
+    mb: 2,
+  },
+
   headerTitle: {
     fontWeight: 700,
     color: '#7a0c0c',
@@ -17,12 +24,15 @@ const styles = {
   tableContainer: {
     borderRadius: 2,
     overflow: 'hidden',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
     maxHeight: '70vh',
-    '@media (max-width: 600px)': {
-      maxHeight: 'none',
-      overflowX: 'auto',
-    },
+    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+  },
+
+  tableContainerMobile: {
+    borderRadius: 2,
+    overflowX: 'auto',
+    maxHeight: 'none',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
   },
 
   table: {
@@ -34,12 +44,12 @@ const styles = {
 
   tableHeadCell: {
     backgroundColor: '#f9e5e5',
+    borderBottom: '2px solid #f3c1c1',
     fontWeight: 700,
     fontSize: '0.85rem',
     color: '#7a0c0c',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    borderBottom: '2px solid #f3c1c1',
     whiteSpace: 'nowrap',
   },
 
@@ -53,11 +63,17 @@ const styles = {
     },
   },
 
-  tableRow: {
-    transition: 'background 0.2s ease',
-    '&:hover': {
-      backgroundColor: '#fff3f3',
-    },
+  rowActive: {
+    cursor: 'pointer',
+    transition: '0.2s ease',
+    '&:hover': { backgroundColor: '#fff3f3' },
+  },
+
+  rowAbandoned: {
+    cursor: 'not-allowed',
+    opacity: 0.6,
+    transition: '0.2s ease',
+    '&:hover': { backgroundColor: 'inherit' },
   },
 
   titleText: {
@@ -65,10 +81,27 @@ const styles = {
     color: '#222',
   },
 
+  dgroupSelect: {
+    minWidth: 80,
+    fontWeight: 700,
+    color: '#7a0c0c',
+    '& .MuiSelect-select': {
+      py: 0.8,
+    },
+    '&.Mui-disabled': {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+    },
+  },
+
   noDataCell: {
     py: 4,
     backgroundColor: '#fffafa',
   },
+
+  noDataText: (isMobile) => ({
+    fontSize: isMobile ? '0.85rem' : '0.95rem',
+  }),
 
   pagination: {
     mt: 3,

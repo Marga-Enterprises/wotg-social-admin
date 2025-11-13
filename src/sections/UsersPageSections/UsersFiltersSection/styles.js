@@ -19,20 +19,24 @@ const styles = {
     '& .MuiOutlinedInput-root': {
       backgroundColor: '#fff',
       borderRadius: 1.5,
-      '& fieldset': {
-        borderColor: 'rgba(0,0,0,0.1)',
-      },
-      '&:hover fieldset': {
-        borderColor: '#c62828',
-      },
+      '& fieldset': { borderColor: 'rgba(0,0,0,0.1)' },
+      '&:hover fieldset': { borderColor: '#c62828' },
       '&.Mui-focused fieldset': {
         borderColor: '#b71c1c',
         boxShadow: '0 0 0 3px rgba(244, 67, 54, 0.15)',
       },
     },
-    '& .MuiInputLabel-root.Mui-focused': {
-      color: '#b71c1c',
-    },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#b71c1c' },
+  },
+
+  // Account Type width
+  filterShort: {
+    minWidth: 120,
+  },
+
+  // D-Group width
+  filterMedium: {
+    minWidth: 150,
   },
 
   searchButton: {

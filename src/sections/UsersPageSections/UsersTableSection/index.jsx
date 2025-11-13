@@ -13,7 +13,10 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Select,
+  MenuItem,
 } from '@mui/material';
+
 import styles from './styles';
 import LoadingScreen from '@components/common/LoadingScreen';
 
@@ -24,6 +27,7 @@ const UsersTableSection = ({
   totalPages,
   onPageChange,
   showMessageModal,
+  onDgroupChange,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -46,26 +50,9 @@ const UsersTableSection = ({
 
   return (
     <Box sx={styles.root}>
-      {/* Header */}
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'stretch', sm: 'center' }}
-        mb={2}
-        spacing={1.5}
-      >
-        <Typography variant="h6" sx={styles.headerTitle}>
-          Users List
-        </Typography>
-      </Stack>
-
-      {/* Table */}
       <TableContainer
         component={Paper}
-        sx={{
-          ...styles.tableContainer,
-          overflowX: isMobile ? 'auto' : 'visible',
-        }}
+        sx={isMobile ? styles.tableContainerMobile : styles.tableContainer}
       >
         <Table stickyHeader size="small" sx={styles.table}>
           <TableHead>
@@ -76,6 +63,7 @@ const UsersTableSection = ({
               {!isMobile && (
                 <TableCell sx={styles.tableHeadCell}>Email</TableCell>
               )}
+              <TableCell sx={styles.tableHeadCell}>D-Group Member</TableCell>
               <TableCell sx={styles.tableHeadCell}>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -89,48 +77,56 @@ const UsersTableSection = ({
                 return (
                   <TableRow
                     key={user.id}
-                    hover
+                    hover={!isAbandoned}
                     onClick={() => !isAbandoned && showMessageModal(user.id)}
-                    sx={{
-                      ...styles.tableRow,
-                      cursor: isAbandoned ? 'not-allowed' : 'pointer',
-                      opacity: isAbandoned ? 0.6 : 1,
-                      '&:hover': {
-                        backgroundColor: isAbandoned
-                          ? 'inherit'
-                          : 'rgba(0,0,0,0.04)',
-                      },
-                    }}
+                    sx={isAbandoned ? styles.rowAbandoned : styles.rowActive}
                   >
                     <TableCell sx={styles.tableBodyCell}>
                       {(page - 1) * 10 + (index + 1)}
                     </TableCell>
 
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="subtitle2" sx={styles.titleText}>
+                      <Typography sx={styles.titleText}>
                         {user.user_fname}
                       </Typography>
                     </TableCell>
 
                     <TableCell sx={styles.tableBodyCell}>
-                      <Typography variant="subtitle2" sx={styles.titleText}>
+                      <Typography sx={styles.titleText}>
                         {user.user_lname}
                       </Typography>
                     </TableCell>
 
                     {!isMobile && (
                       <TableCell sx={styles.tableBodyCell}>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography color="text.secondary">
                           {user.email}
                         </Typography>
                       </TableCell>
                     )}
 
-                    <TableCell sx={styles.tableBodyCell}>
-                      <Typography
-                        variant="body2"
-                        sx={{ color, fontWeight: 600 }}
+                    {/* --- D-GROUP SELECT --- */}
+                    <TableCell
+                      sx={styles.tableBodyCell}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Select
+                        value={user.user_already_a_dgroup_member ? true : false}
+                        onChange={(e) => onDgroupChange(user.id, e.target.value)}
+                        size="small"
+                        sx={styles.dgroupSelect}
+                        disabled={
+                          user.guest_account === true ||
+                          user.guest_status === 'abandoned'
+                        }
                       >
+                        <MenuItem value={true}>YES</MenuItem>
+                        <MenuItem value={false}>NO</MenuItem>
+                      </Select>
+                    </TableCell>
+
+                    <TableCell sx={styles.tableBodyCell}>
+                      <Typography sx={{ color, fontWeight: 600 }}>
                         {label}
                       </Typography>
                     </TableCell>
@@ -139,12 +135,8 @@ const UsersTableSection = ({
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={styles.noDataCell}>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontSize: isMobile ? '0.85rem' : '0.95rem' }}
-                  >
+                <TableCell colSpan={6} sx={styles.noDataCell} align="center">
+                  <Typography sx={styles.noDataText(isMobile)}>
                     No users found.
                   </Typography>
                 </TableCell>
@@ -154,12 +146,11 @@ const UsersTableSection = ({
         </Table>
       </TableContainer>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <Pagination
           count={totalPages}
           page={page}
-          onChange={(e, value) => onPageChange(value)}
+          onChange={(e, v) => onPageChange(v)}
           sx={styles.pagination}
         />
       )}

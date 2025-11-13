@@ -12,16 +12,15 @@ export const useLogic = (navigate, location) => {
   const dispatch = useDispatch();
   const loadingRef = useRef(false);
 
-  // ✅ Get logged-in user directly from cookies
+  // Get logged-in user from cookies
   let currentUser = null;
   try {
     const cookieData = Cookies.get('account');
     if (cookieData) currentUser = JSON.parse(cookieData);
   } catch (err) {
-    console.error('❌ Failed to parse user cookie:', err);
+    console.error('Failed to parse user cookie:', err);
   }
 
-  // 🧠 States
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -35,14 +34,15 @@ export const useLogic = (navigate, location) => {
     totalPages: 0,
   });
 
-  // 🧩 Fetch Users with filters
+  // Fetch Users
   const handleFetchUsers = useCallback(
     async (
       pageIndex = 1,
       search = '',
       guestFilter = 'both',
       dateFrom = '',
-      dateTo = ''
+      dateTo = '',
+      dgroupFilter = ''
     ) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
@@ -57,11 +57,13 @@ export const useLogic = (navigate, location) => {
             guestFilter,
             dateFrom,
             dateTo,
+            dgroupFilter,
           })
         );
 
         if (res?.success && res.data) {
           const { users = [], totalItems, currentPage, totalPages } = res.data;
+
           setUsers(users);
           setPageDetails({
             totalRecords: totalItems || 0,
@@ -70,7 +72,7 @@ export const useLogic = (navigate, location) => {
           });
         }
       } catch (err) {
-        console.error('❌ Fetch users error:', err);
+        console.error('Fetch users error:', err);
       } finally {
         loadingRef.current = false;
         setLoading(false);
@@ -79,13 +81,12 @@ export const useLogic = (navigate, location) => {
     [dispatch]
   );
 
-  // 🧠 Handle Filter Changes
+  // Handle Filter Change
   const handleFilterChange = useCallback(
     (newFilters) => {
       const params = new URLSearchParams(location.search);
-      params.set('page', '1'); // reset to first page
+      params.set('page', '1');
 
-      // Apply filters
       if (newFilters.search) params.set('search', newFilters.search);
       else params.delete('search');
 
@@ -96,6 +97,9 @@ export const useLogic = (navigate, location) => {
 
       if (newFilters.dateTo) params.set('dateTo', newFilters.dateTo);
       else params.delete('dateTo');
+
+      if (newFilters.dgroupFilter) params.set('dgroupFilter', newFilters.dgroupFilter);
+      else params.delete('dgroupFilter');
 
       if (
         newFilters.trigger === 'manual' ||
@@ -108,11 +112,11 @@ export const useLogic = (navigate, location) => {
     [navigate, location.search]
   );
 
-  // 🧠 Handle Create Private Chatroom + Send Message
+  // Create Chatroom + Send Message
   const handleCreateChatroomAndSendMessage = useCallback(
     async (content, targetUserId) => {
       if (!currentUser?.id) {
-        alert("Please login first.");
+        alert('Please login first.');
         return;
       }
 
@@ -123,49 +127,39 @@ export const useLogic = (navigate, location) => {
         };
 
         const baseUrl =
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:3000/chat"
-            : "https://community.wotgonline.com/chat";
+          process.env.NODE_ENV === 'development'
+            ? 'http://localhost:3000/chat'
+            : 'https://community.wotgonline.com/chat';
 
-        const res = await dispatch(marga.chatroom.createChatroomAction(payload));
+        const res = await dispatch(
+          marga.chatroom.createChatroomAction(payload)
+        );
 
-        // Chatroom variables
-        let chatId, chatUrl, tabName;
+        let chatId =
+          res?.success && res?.data?.id
+            ? res.data.id
+            : res?.error?.data?.chatroomId;
 
-        if (res?.success && res?.data?.id) {
-          // 🆕 Chatroom successfully created
-          chatId = res.data.id;
-          console.log("✅ New chatroom created:", chatId);
-        } else {
-          // ♻️ Chatroom already exists
-          chatId = res?.error?.data?.chatroomId;
-          console.log("ℹ️ Chatroom already exists:", chatId);
-        }
+        const chatUrl = `${baseUrl}?chat=${chatId}`;
+        const tabName = `chat_${chatId}`;
 
-        // 🧠 Construct chat URL + tab name
-        chatUrl = `${baseUrl}?chat=${chatId}`;
-        tabName = `chat_${chatId}`;
-
-        // ✉️ Send message to chatroom (always)
         await dispatch(
           marga.message.sendMessageAction({
             chatroomId: chatId,
             senderId: currentUser.id,
             content,
-            type: "text",
+            type: 'text',
           })
         );
 
-        // 🔗 Open chat in a new tab
         const openChatTab = () => {
-          const newTab = window.open(chatUrl, tabName, "noopener,noreferrer");
+          const newTab = window.open(chatUrl, tabName, 'noopener,noreferrer');
 
-          if (!newTab || newTab.closed || typeof newTab.closed === "undefined") {
-            // 🧩 Fallback if popup is blocked
-            const tempLink = document.createElement("a");
+          if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+            const tempLink = document.createElement('a');
             tempLink.href = chatUrl;
-            tempLink.target = "_blank";
-            tempLink.rel = "noopener noreferrer";
+            tempLink.target = '_blank';
+            tempLink.rel = 'noopener noreferrer';
             document.body.appendChild(tempLink);
             tempLink.click();
             document.body.removeChild(tempLink);
@@ -173,29 +167,53 @@ export const useLogic = (navigate, location) => {
         };
 
         openChatTab();
-
-        // reload page to reflect any changes
-        // EsetTimeout(() => { window.location.reload();E}, 500);
-        console.log("✅ Message sent and chat opened:", chatUrl);
       } catch (err) {
-        console.error("❌ Error creating or sending message:", err);
+        console.error('Error creating or sending message:', err);
       }
     },
     [dispatch, currentUser]
   );
 
-  // handle show message modal
+  // Modal controls
   const handleShowMessageModal = useCallback((userId) => {
     setSelectedUserId(userId);
     setMessageModalOpen(true);
   }, []);
 
-  // handle close message modal
   const handleCloseMessageModal = useCallback(() => {
     setSelectedUserId(null);
     setMessageModalOpen(false);
   }, []);
 
+  // Update User D-Group Status
+  const handleUpdateUserDGroupStatus = useCallback(
+    async (userId, newStatus) => {
+      try {
+        const res = await dispatch(
+          marga.user.updateUserDGroupStatusAction(userId, newStatus)
+        );
+
+        if (res.success) {
+          handleFetchUsers(
+            pageDetails.pageIndex,
+            new URLSearchParams(location.search).get('search') || '',
+            new URLSearchParams(location.search).get('guestAccount') || 'both',
+            new URLSearchParams(location.search).get('dateFrom') || '',
+            new URLSearchParams(location.search).get('dateTo') || '',
+            new URLSearchParams(location.search).get('dgroupFilter') || ''
+          );
+          
+          setOpenSnackbar(true);
+          setSeverity('success');
+          setMessage('D-Group membership status updated successfully.');
+        }
+      } catch (err) {
+        console.error('Error updating D-Group status:', err);
+        return { error: 'Failed to update D-Group status.' };
+      }
+    },
+    [dispatch]
+  );
 
   return {
     loading,
@@ -208,5 +226,6 @@ export const useLogic = (navigate, location) => {
     handleShowMessageModal,
     handleCloseMessageModal,
     handleCreateChatroomAndSendMessage,
+    handleUpdateUserDGroupStatus,
   };
 };
