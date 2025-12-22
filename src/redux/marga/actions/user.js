@@ -3,7 +3,7 @@ import {
   loginService,
   fetchUsersService,
   fetchUserDetailService,
-  updateUserDGroupStatusService,
+  updateUserDGroupStatusOrRoleService,
 } from '@services/api/user';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -99,11 +99,9 @@ export const fetchUserDetailAction = (userId) => async () => {
 
 
 // Update User D-Group Membership Status
-export const updateUserDGroupStatusAction = (userId, isDGroupMember) => async () => {
-  console.log('Action called with:', userId, isDGroupMember);
-
+export const updateUserDGroupStatusOrRoleAction = (userId, payload) => async () => {
   try {
-    const res = await updateUserDGroupStatusService(userId, isDGroupMember);
+    const res = await updateUserDGroupStatusOrRoleService(userId, payload);
     return res;
   } catch (err) {
     return { error: err.response?.data?.msg };

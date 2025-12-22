@@ -17,8 +17,6 @@ export async function fetchUserDetailService(userId) {
   return GET(`/user/${userId}`);
 };
 
-export async function updateUserDGroupStatusService(userId, isDGroupMember) {
-  console.log('API Call - updateUserDGroupStatusService:', userId, isDGroupMember);
-
-  return PUT(`/user/${userId}`, { isDGroupMember });
+export async function updateUserDGroupStatusOrRoleService(userId, payload) {
+  return PUT(`/user/${userId}`, payload);
 };

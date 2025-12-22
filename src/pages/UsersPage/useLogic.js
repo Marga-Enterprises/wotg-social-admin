@@ -187,10 +187,15 @@ export const useLogic = (navigate, location) => {
 
   // Update User D-Group Status
   const handleUpdateUserDGroupStatus = useCallback(
-    async (userId, newStatus) => {
+    async (userId, target, value) => {
+      let payload = {
+        isDGroupMember: target === 'isDGroupMember' ? value : null,
+        user_role: target === 'user_role' ? value : null,
+      };
+
       try {
         const res = await dispatch(
-          marga.user.updateUserDGroupStatusAction(userId, newStatus)
+          marga.user.updateUserDGroupStatusOrRoleAction(userId, payload)
         );
 
         if (res.success) {

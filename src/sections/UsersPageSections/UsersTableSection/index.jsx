@@ -63,6 +63,7 @@ const UsersTableSection = ({
               {!isMobile && (
                 <TableCell sx={styles.tableHeadCell}>Email</TableCell>
               )}
+              <TableCell sx={styles.tableHeadCell}>Role</TableCell>
               <TableCell sx={styles.tableHeadCell}>D-Group Member</TableCell>
               <TableCell sx={styles.tableHeadCell}>Status</TableCell>
             </TableRow>
@@ -105,6 +106,26 @@ const UsersTableSection = ({
                       </TableCell>
                     )}
 
+                    <TableCell
+                      sx={styles.tableBodyCell}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Select
+                        value={user.user_role}
+                        onChange={(e) => onDgroupChange(user.id, 'user_role', e.target.value)}
+                        size="small"
+                        sx={styles.dgroupSelect}
+                        disabled={
+                          user.guest_account === true ||
+                          user.guest_status === 'abandoned'
+                        }
+                      >
+                        <MenuItem value="missionary">Missionary</MenuItem>
+                        <MenuItem value="admin">Admin</MenuItem>
+                        <MenuItem value="member">Member</MenuItem>
+                      </Select>
+                    </TableCell>
+
                     {/* --- D-GROUP SELECT --- */}
                     <TableCell
                       sx={styles.tableBodyCell}
@@ -112,7 +133,7 @@ const UsersTableSection = ({
                     >
                       <Select
                         value={user.user_already_a_dgroup_member ? true : false}
-                        onChange={(e) => onDgroupChange(user.id, e.target.value)}
+                        onChange={(e) => onDgroupChange(user.id, 'isDGroupMember', e.target.value)}
                         size="small"
                         sx={styles.dgroupSelect}
                         disabled={
