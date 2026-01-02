@@ -49,6 +49,8 @@ export const useLogic = (navigate, location) => {
       setLoading(true);
 
       try {
+        console.log('Page Index:', pageIndex);
+
         const res = await dispatch(
           marga.user.fetchUsersAction({
             pageIndex,
@@ -64,6 +66,8 @@ export const useLogic = (navigate, location) => {
         if (res?.success && res.data) {
           const { users = [], totalItems, currentPage, totalPages } = res.data;
 
+          console.log('Fetched Users:', res.data);
+
           setUsers(users);
           setPageDetails({
             totalRecords: totalItems || 0,
@@ -78,12 +82,14 @@ export const useLogic = (navigate, location) => {
         setLoading(false);
       }
     },
-    [dispatch]
+    []
   );
 
   // Handle Filter Change
   const handleFilterChange = useCallback(
     (newFilters) => {
+      console.log('New Filters:', newFilters);
+
       const params = new URLSearchParams(location.search);
       params.set('page', '1');
 
@@ -109,7 +115,7 @@ export const useLogic = (navigate, location) => {
         navigate(`?${params.toString()}`);
       }
     },
-    [navigate, location.search]
+    []
   );
 
   // Create Chatroom + Send Message

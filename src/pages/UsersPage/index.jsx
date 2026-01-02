@@ -50,6 +50,8 @@ const Page = () => {
     const dateTo = queryParams.get('dateTo') || today;
     
     const dgroupFilter = queryParams.get('dgroupFilter') || '';
+    
+    console.log('CURRENT PAGE', currentPage);
 
     handleFetchUsers(currentPage, search, guestAccount, dateFrom, dateTo, dgroupFilter);
   }, [location.search, handleFetchUsers]);
@@ -84,6 +86,7 @@ const Page = () => {
         totalPages={pageDetails.totalPages}
         showMessageModal={handleShowMessageModal}
         onPageChange={(newPage) => {
+          console.log('Navigating to page:', newPage);
           const params = new URLSearchParams(location.search);
           params.set('page', newPage);
           navigate(`?${params.toString()}`);
